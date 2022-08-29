@@ -102,12 +102,8 @@ class ArtificialPotentialField():
 
     def sort_coordinates(self, coordinates):
 
-        sorted_coordinates = [[0, 0]] * self.num_of_drones
+        sorted_coordinates = [[0, 0, 0]] * self.num_of_drones
 
-        if type(coordinates) == dict:
-            print("----------------")
-            for coordinate in coordinates.values():
-                print(coordinate)
 
         if type(coordinates) == dict:
 
@@ -119,12 +115,19 @@ class ArtificialPotentialField():
             cost_matrix = [[math.sqrt((target[0] - self.agent_positions[id][0])**2 
             + (target[1] - self.agent_positions[id][1])**2 
             + (target[2] - self.agent_positions[id][2])**2 ) for target in coordinates] for id in self.agent_ids] # cost matrix is a matrix of distances between each drone and each target
-                
+
         assigner = Munkres() # Hungarian algorithm
         assignments = assigner.compute(cost_matrix) 
-        
-        for assignment in assignments:
-            sorted_coordinates[assignment[0]] = coordinates[assignment[1]]
+        # assignments is a list of tuples (i, j), where i is the index of the drone and j is the index of the target
+
+        if type(coordinates) == dict:
+            for assignment in assignments:
+                
+                sorted_coordinates[assignment[0]] = list(coordinates.values())[assignment[1]]
+                
+        else:
+            for assignment in assignments:
+                sorted_coordinates[assignment[0]] = coordinates[assignment[1]]
 
         coordinates_by_ids = {}
         for i in range(len(self.agent_ids)):

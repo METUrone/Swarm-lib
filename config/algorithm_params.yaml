@@ -1,0 +1,9 @@
+
+artificial_potential_field:
+
+  attractive_constant: 0.8
+  repulsive_constant: -0.005 # must be negative
+  repulsive_threshold: 0.3
+  speed_limit: 2
+  error_radius: 0.1 # distance between goal and agent to determine if it has reached goal
+  potential_field_timeout: 1000

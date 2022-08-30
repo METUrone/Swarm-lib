@@ -37,6 +37,9 @@ class ArtificialPotentialField():
         self.repulsive_threshold = rospy.get_param("/artificial_potential_field/repulsive_threshold")
         self.potential_field_timeout = rospy.get_param("/artificial_potential_field/potential_field_timeout")
 
+        for agent in self.agents:
+            self.agent_positions[agent["id"]] = agent["initialPosition"]
+
         for id in self.agent_ids:
             vel_command = Twist()
 

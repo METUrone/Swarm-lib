@@ -7,8 +7,10 @@
 
     <node pkg="swarm" type="setup.py" name="setup" output="screen"/>
 
-    <!-- node pkg="swarm" type="crazyswarm_controller.py" name="crazyswarm_controller" output="screen" args="$(arg sim)"/ -->
+    <node pkg="swarm" type="multi_agent_gen_gazebo.py" name="multi_agent_gen_gazebo" output="screen"/>
     
-    <node pkg="swarm" type="mission_planner.py" name="mission_planner" output="screen"/>
+    <node pkg="swarm" type="iris_takeoff.py" name="iris_takeoff" output="screen"/>
+
+    <!-- node pkg="swarm" type="mission_planner.py" name="mission_planner" output="screen"/-->
 
 </launch>

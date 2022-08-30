@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 import rospy
+import numpy as np
+
 from pycrazyswarm import Crazyswarm
 from geometry_msgs.msg import PoseStamped, Twist
 from threading import Thread
-import numpy as np
+from swarm.srv import TakeoffAndLand
 
 rospy.init_node("crazyswarm_controller")
 
@@ -14,6 +16,7 @@ num_of_drones = len(swarm_params)
 sleep_duration = 0.01
 
 
+
 crazyswarm = Crazyswarm("{}/../config/crazyflies.yaml".format(__file__.strip("crazyswarm_controller.py")))
 agent_list = crazyswarm.allcfs.crazyflies
 timeHelper = crazyswarm.timeHelper
@@ -21,9 +24,31 @@ agents_by_id = crazyswarm.allcfs.crazyfliesById
 pose_publishers = {}
 vel_commands = {}
 
-for agent in agent_list:
-    agent.takeoff(targetHeight=1, duration=1)
-timeHelper.sleep(1)
+# for agent in agent_list:
+#     agent.takeoff(targetHeight=1, duration=1)
+# timeHelper.sleep(1)
+
+
+def takeoff_and_land_handler(req):
+    if req.command.data == "takeoff":
+        rospy.loginfo("TAKEOFF SERVICE CALLED    ID: {}".format(req.id))
+        agents_by_id[req.id].takeoff(targetHeight=req.height, duration=req.duration)
+        
+
+    elif req.command.data == "land":
+        rospy.loginfo("LAND SERVICE CALLED    ID: {}".format(req.id))
+        agents_by_id[req.id].land(targetHeight=req.height, duration=req.duration)
+        for agent in agent_list:
+            agent.land(targetHeight=0.05, duration=1)
+
+
+    else:
+        rospy.loginfo("UNKNOWN COMMAND    ID: {}".format(req.command.data))
+
+    timeHelper.sleep(1)
+    return True
+
+takeoff_and_land = rospy.Service("/takeoff_and_land", TakeoffAndLand, takeoff_and_land_handler)
 
 
 def vel_commander_callback(data : Twist, agent_id):

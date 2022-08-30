@@ -1,0 +1,6 @@
+std_msgs/String command
+float32 height
+float32 duration
+int16 id
+---
+bool success

@@ -55,13 +55,9 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  PoseCommand.srv
-  PoseCommandResponse.srv
-  VelocityCommand.srv
-  VelocityCommandResponse.srv
-)
+# add_service_files(
+#   FILES
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(

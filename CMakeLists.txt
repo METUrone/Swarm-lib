@@ -8,6 +8,7 @@ project(swarm)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  roscpp
   rospy
   std_msgs
   message_generation
@@ -209,3 +210,8 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_executable(takeoff src/iris_takeoff.cpp)
+target_link_libraries(takeoff
+  ${catkin_LIBRARIES}
+)

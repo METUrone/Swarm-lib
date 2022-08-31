@@ -52,8 +52,8 @@ temp = """
             <arg name="P" value="0"/>
             <arg name="Y" value="0"/>
             <arg name="vehicle" value="$(arg vehicle)"/>
-            <arg name="mavlink_udp_port" value="{}"/>
-            <arg name="mavlink_tcp_port" value="{}"/>
+            <arg name="mavlink_udp_port" value="{}@"/>
+            <arg name="mavlink_tcp_port" value="{}@"/>
             <arg name="ID" value="$(arg ID)"/>
         </include>
         <!-- MAVROS -->
@@ -73,7 +73,7 @@ for i in range(num_of_drones):
     x = swarm_params[i]["initialPosition"][0]
     y = swarm_params[i]["initialPosition"][1]
     z = swarm_params[i]["initialPosition"][2]
-    str = str + temp.format(i, i, i, i+14540, i+14580, x, y, z, i+14560, i+4560)
+    str = str + temp.format(i, i, i, i+14540, i+14580, x, y, z, i+14580, i+4560)
 
 result = begin + str + end
 

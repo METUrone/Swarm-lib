@@ -9,7 +9,7 @@
 
     <node pkg="swarm" type="multi_agent_gen_gazebo.py" name="multi_agent_gen_gazebo" output="screen"/>
     
-    <node pkg="swarm" type="iris_takeoff.py" name="iris_takeoff" output="screen"/>
+    <node pkg="swarm" type="takeoff_iris.py" name="takeoff"/>
 
     <!-- node pkg="swarm" type="mission_planner.py" name="mission_planner" output="screen"/-->
 

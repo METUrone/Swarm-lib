@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import rospy
 import time
 import numpy as np
@@ -9,7 +7,6 @@ from munkres import Munkres
 from utils import *
 from geometry_msgs.msg import PoseStamped, Twist
 from threading import Thread
-from swarm.srv import TakeoffAndLand, TakeoffAndLandRequest, TakeoffAndLandResponse
 
 
 
@@ -24,7 +21,6 @@ class ArtificialPotentialField():
         self.get_agent_ids() # It is also possible to explicitly give id list without using this method
         self.vel_publishers = {}
         self.vel_commands = {}
-        self.obstacle_list = rospy.get_param("/obstacles") # Gets params from obstacles parameters
         self.obstacles = {}
         self.repulsive_pts = {}
         self.rate = rospy.Rate(100) # 10 Hz
@@ -39,6 +35,9 @@ class ArtificialPotentialField():
         self.repulsive_threshold = rospy.get_param("/artificial_potential_field/repulsive_threshold")
         self.potential_field_timeout = rospy.get_param("/artificial_potential_field/potential_field_timeout")
 
+        for agent in self.agents:
+            self.agent_positions[agent["id"]] = agent["initialPosition"]
+
         for id in self.agent_ids:
             vel_command = Twist()
 
@@ -51,39 +50,9 @@ class ArtificialPotentialField():
            
             self.vel_commands[id] = vel_command
 
-        self.takeoff_and_land = rospy.ServiceProxy("/takeoff_and_land", TakeoffAndLand)
-
         Thread(target=rospy.spin).start()
         Thread(target=self.vel_commander_loop).start()
         time.sleep(2) # Wait until all drones are ready
-
-    def takeoff(self, id, height, duration):
-        req = TakeoffAndLandRequest()
-        req.command.data = "takeoff"
-        req.id = id
-        req.height = height
-        req.duration = duration
-        res = self.takeoff_and_land(req)
-        return res.success
-
-    def land(self, id, height, duration):
-        req = TakeoffAndLandRequest()
-        req.command.data = "land"
-        req.id = id
-        req.height = height
-        req.duration = duration
-        res = self.takeoff_and_land(req)
-        return res.success
-
-    def land_all_drones(self):
-        for id in self.agent_ids:
-            self.land(id, 0.0, 1.0)
-            rospy.sleep(1.0)
-
-    def take_off_all_drones(self):
-        for id in self.agent_ids:
-            self.takeoff(id, 1.0, 1.0)
-            rospy.sleep(1.0)
 
 
     def limit_velocity(self, velocity_twist, max_velocity):

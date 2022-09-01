@@ -6,9 +6,17 @@
 
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Twist.h>
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/State.h>
+
+geometry_msgs::PoseStamped pose;
+void pose_cb(const geometry_msgs::PoseStamped::ConstPtr& msg)
+{
+    pose = *msg;
+    // ROS_INFO("Pose: x: %f, y: %f, z: %f", pose.pose.position.x, pose.pose.position.y, pose.pose.position.z);
+}
 
 mavros_msgs::State current_state;
 void state_cb(const mavros_msgs::State::ConstPtr& msg){
@@ -35,12 +43,14 @@ int main(int argc, char **argv)
 
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
             (topic_fomatter(atoi(argv[1]), "mavros/state"), 10, state_cb);
-    ros::Publisher local_pos_pub = nh.advertise<geometry_msgs::PoseStamped>
-            (topic_fomatter(atoi(argv[1]), "mavros/setpoint_position/local"), 10);
     ros::ServiceClient arming_client = nh.serviceClient<mavros_msgs::CommandBool>
             (topic_fomatter(atoi(argv[1]), "mavros/cmd/arming"));
     ros::ServiceClient set_mode_client = nh.serviceClient<mavros_msgs::SetMode>
             (topic_fomatter(atoi(argv[1]), "mavros/set_mode"));
+    ros::Publisher velo_pub = nh.advertise<geometry_msgs::Twist>
+            (topic_fomatter(atoi(argv[1]), "mavros/setpoint_velocity/cmd_vel_unstamped"), 10);
+    ros::Subscriber pose_sub = nh.subscribe<geometry_msgs::PoseStamped>
+            (topic_fomatter(atoi(argv[1]), "mavros/local_position/pose"), 10, pose_cb);
 
     //the setpoint publishing rate MUST be faster than 2Hz
     ros::Rate rate(20.0);
@@ -53,18 +63,18 @@ int main(int argc, char **argv)
         rate.sleep();
     }
 
-    geometry_msgs::PoseStamped pose;
-    pose.pose.position.x = 0;
-    pose.pose.position.y = 0;
-    pose.pose.position.z = 2;
+    geometry_msgs::Twist velo;
+    velo.linear.x = 0;
+    velo.linear.y = 0;
+    velo.linear.z = 1;
 
-    //send a few setpoints before starting
-    ROS_INFO("Sending initial setpoints");
-    for(int i = 100; ros::ok() && i > 0; --i){
-        local_pos_pub.publish(pose);
-        ros::spinOnce();
-        rate.sleep();
-    }
+    // //send a few setpoints before starting
+    // ROS_INFO("Sending initial setpoints");
+    // for(int i = 100; ros::ok() && i > 0; --i){
+    //     velo_pub.publish(pose);
+    //     ros::spinOnce();
+    //     rate.sleep();
+    // }
 
     mavros_msgs::SetMode offb_set_mode;
     offb_set_mode.request.custom_mode = "OFFBOARD";
@@ -94,7 +104,18 @@ int main(int argc, char **argv)
             }
         }
 
-        local_pos_pub.publish(pose);
+        if (pose.pose.position.z < 2.0) {
+            velo.linear.x = 0;
+            velo.linear.y = 0;
+            velo.linear.z = 2;
+            velo_pub.publish(velo);
+        } else {
+            velo.linear.x = 0;
+            velo.linear.y = 0;
+            velo.linear.z = 0;
+            velo_pub.publish(velo);
+        }
+        
 
         ros::spinOnce();
         rate.sleep();

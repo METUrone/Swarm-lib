@@ -1,6 +1,6 @@
 <launch>
     
-    <arg name="sim" default="--sim"/> <!--roslaunch swarm crazyswarm.launch sim:="sim" -->
+    <arg name="node_start_delay" default="5.0" />  
 
     <rosparam command="load" file="$(find swarm)/config/crazyflies.yaml"/>
     <rosparam command="load" file="$(find swarm)/config/algorithm_params.yaml"/>
@@ -9,8 +9,10 @@
 
     <node pkg="swarm" type="multi_agent_gen_gazebo.py" name="multi_agent_gen_gazebo" output="screen"/>
     
-    <node pkg="swarm" type="takeoff_iris.py" name="takeoff"/>
+    <node pkg="swarm" type="takeoff_iris_multiple.py" name="takeoff" output="screen"/>
 
-    <!-- node pkg="swarm" type="mission_planner.py" name="mission_planner" output="screen"/-->
+    <node pkg="swarm" type="iris_controller.py" name="iris_controller" output="screen"/>
+
+    <node pkg="swarm" type="mission_planner.py" name="mission_planner" output="screen" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' "/>
 
 </launch>

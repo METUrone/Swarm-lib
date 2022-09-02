@@ -1,5 +1,4 @@
-# Swarm-lib
-Generic API to use in swarm application.
+# Gazebo Simulation for Swarm-lib
 
 **Install Dependecies**
 

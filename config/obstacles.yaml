@@ -1,0 +1,11 @@
+obstacles:
+
+- id: 1
+  position: [-2, -2, 0]
+  radius: 0.1
+  length: 7
+
+- id: 2
+  position: [2, 2, 0]
+  radius: 0.3
+  length: 12

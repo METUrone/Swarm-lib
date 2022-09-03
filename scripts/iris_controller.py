@@ -6,9 +6,10 @@ from sensor_msgs.msg import NavSatFix
 from threading import Thread
 import numpy as np
 
-latitude: 47.3977419
-longitude: 8.5455938
-altitude: 535.2649158429224
+
+sim_origin_latitude: 47.3977419
+sim_origin_longitude: 8.545594
+sim_origin_altitude: 535.2329155639569
 
 
 rospy.init_node("iris_controller")
@@ -71,8 +72,8 @@ def publish_positions(agent_ids):
 
         for agent_id in agent_ids:
             agent_pose = current_poses[agent_id]
-            pose.pose.position.x = agent_pose.longitude - sim_origin_longitude
-            pose.pose.position.y = agent_pose.latitude - sim_origin_latitude
+            pose.pose.position.x = agent_pose.latitude - sim_origin_latitude
+            pose.pose.position.y = agent_pose.longitude - sim_origin_longitude
             pose.pose.position.z = agent_pose.altitude - sim_origin_altitude
 
             pose_publishers[agent_id].publish(pose)

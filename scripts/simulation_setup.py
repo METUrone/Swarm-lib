@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from statistics import mode
 import rospy
 import os
 
@@ -6,9 +7,56 @@ rospy.init_node("multi_agent_gen_gazebo")
 
 swarm_params = rospy.get_param("/crazyflies")
 print(swarm_params)
+obstacle_params = rospy.get_param("/obstacles")
+print(obstacle_params)
 
 num_of_drones = len(swarm_params)
+num_of_obstacles = len(obstacle_params)
 sleep_duration = 0.01
+
+model_str = """
+<robot name="obstacle">
+  <link name="my_obstacle">
+    <inertial>
+      <origin xyz="2 0 0" />
+      <mass value="1.0" />
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="1.0" />
+    </inertial>"""
+
+model_temp = """
+    <visual>
+      <origin xyz="{} {} {}"/>
+      <geometry>
+        <cylinder radius="{}" length="{}"/>
+      </geometry>
+    </visual>
+"""
+
+for i in range(num_of_obstacles):
+    x = obstacle_params[i]["position"][0]
+    y = obstacle_params[i]["position"][1]
+    z = obstacle_params[i]["position"][2]
+    radius = obstacle_params[i]["radius"]
+    length = obstacle_params[i]["length"]
+    model_str += model_temp.format(x, y, z, radius, length)
+
+model_str += """
+    <collision>
+      <origin xyz="2 0 1"/>
+      <geometry>
+        <box size="1 1 2" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="my_obstacle">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  </robot>"""
+
+f = open("/home/emirhan/Swarm/src/Swarm-lib/launch/obstacle.urdf", "w")
+f.write(model_str)
+f.close()
+
 
 begin = """<?xml version="1.0"?>
 <launch>
@@ -74,6 +122,8 @@ for i in range(num_of_drones):
     y = swarm_params[i]["initialPosition"][1]
     z = swarm_params[i]["initialPosition"][2]
     str = str + temp.format(i, i, i, i+14540, i+14580, x, y, z, i+14580, i+4560)
+
+str += '<node name="obstacle_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -file /home/emirhan/Swarm/src/Swarm-lib/launch/obstacle.urdf -model my_obstacle  -x 0 -y 0 -z 0"/>'
 
 result = begin + str + end
 

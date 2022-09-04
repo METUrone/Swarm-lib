@@ -6,8 +6,6 @@
     <rosparam command="load" file="$(find swarm)/config/algorithm_params.yaml"/>
     <rosparam command="load" file="$(find swarm)/config/obstacles.yaml"/>
 
-    <node pkg="swarm" type="setup.py" name="setup" output="screen"/>
-
     <node pkg="swarm" type="simulation_setup.py" name="simulation_setup" output="screen"/>
 
     <!--node name="obstacle_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -file /home/emirhan/Swarm/src/Swarm-lib/launch/obstacle.urdf -model my_obstacle  -x 0 -y 0 -z 0"/-->

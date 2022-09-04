@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from pathlib import Path
 from statistics import mode
 import rospy
 import os
@@ -43,10 +44,8 @@ model_str = """
   </gazebo>
   </robot>""".format(obstacle_radius, obstacle_height)
 
-f = open("/home/emirhan/Swarm/src/Swarm-lib/launch/obstacle.urdf", "w")
-f.write(model_str)
-f.close()
-
+f = Path("~/Swarm/src/Swarm-lib/launch/obstacle.urdf").expanduser()
+f.write_text(model_str)
 
 begin = """<?xml version="1.0"?>
 <launch>
@@ -115,7 +114,7 @@ for i in range(num_of_drones):
 
 for i in range(num_of_obstacles):
   obstacle = obstacle_params[i]
-  str += '<node name="obstacle_spawn{}" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -file /home/emirhan/Swarm/src/Swarm-lib/launch/obstacle.urdf -model my_obstacle{}  -x {} -y {} -z {}"/> \n'.format(i, i, obstacle[0], obstacle[1], obstacle[2])
+  str += '<node name="obstacle_spawn{}" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -file {} -model my_obstacle{}  -x {} -y {} -z {}"/> \n'.format(i, f.absolute(), i, obstacle[0], obstacle[1], obstacle[2])
 
 result = begin + str + end
 

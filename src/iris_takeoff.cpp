@@ -104,17 +104,10 @@ int main(int argc, char **argv)
             }
         }
 
-        if (pose.pose.position.z < 2.0) {
-            velo.linear.x = 0;
-            velo.linear.y = 0;
-            velo.linear.z = 2;
-            velo_pub.publish(velo);
-        } else {
-            velo.linear.x = 0;
-            velo.linear.y = 0;
-            velo.linear.z = 0;
-            velo_pub.publish(velo);
-        }
+        velo.linear.x = 0;
+        velo.linear.y = 0;
+        velo.linear.z = 2.0 - pose.pose.position.z;
+        velo_pub.publish(velo);
         
 
         ros::spinOnce();

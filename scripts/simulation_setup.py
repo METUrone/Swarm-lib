@@ -14,33 +14,23 @@ num_of_drones = len(swarm_params)
 num_of_obstacles = len(obstacle_params)
 sleep_duration = 0.01
 
+obstacle_radius = rospy.get_param("/radius")
+obstacle_height = rospy.get_param("/height")
+
 model_str = """
 <robot name="obstacle">
   <link name="my_obstacle">
     <inertial>
       <origin xyz="2 0 0" />
-      <mass value="1.0" />
-      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="1.0" />
-    </inertial>"""
-
-model_temp = """
+      <mass value="10.0" />
+      <inertia  ixx="5.0" ixy="0.0"  ixz="0.0"  iyy="100.0"  iyz="0.0"  izz="1.0" />
+    </inertial>
     <visual>
-      <origin xyz="{} {} {}"/>
+      <origin xyz="0 0 0"/>
       <geometry>
         <cylinder radius="{}" length="{}"/>
       </geometry>
     </visual>
-"""
-
-for i in range(num_of_obstacles):
-    x = obstacle_params[i]["position"][0]
-    y = obstacle_params[i]["position"][1]
-    z = obstacle_params[i]["position"][2]
-    radius = obstacle_params[i]["radius"]
-    length = obstacle_params[i]["length"]
-    model_str += model_temp.format(x, y, z, radius, length)
-
-model_str += """
     <collision>
       <origin xyz="2 0 1"/>
       <geometry>
@@ -51,7 +41,7 @@ model_str += """
   <gazebo reference="my_obstacle">
     <material>Gazebo/Blue</material>
   </gazebo>
-  </robot>"""
+  </robot>""".format(obstacle_radius, obstacle_height)
 
 f = open("/home/emirhan/Swarm/src/Swarm-lib/launch/obstacle.urdf", "w")
 f.write(model_str)
@@ -123,7 +113,9 @@ for i in range(num_of_drones):
     z = swarm_params[i]["initialPosition"][2]
     str = str + temp.format(i, i, i, i+14540, i+14580, x, y, z, i+14580, i+4560)
 
-str += '<node name="obstacle_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -file /home/emirhan/Swarm/src/Swarm-lib/launch/obstacle.urdf -model my_obstacle  -x 0 -y 0 -z 0"/>'
+for i in range(num_of_obstacles):
+  obstacle = obstacle_params[i]
+  str += '<node name="obstacle_spawn{}" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -file /home/emirhan/Swarm/src/Swarm-lib/launch/obstacle.urdf -model my_obstacle{}  -x {} -y {} -z {}"/> \n'.format(i, i, obstacle[0], obstacle[1], obstacle[2])
 
 result = begin + str + end
 

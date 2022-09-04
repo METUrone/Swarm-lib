@@ -21,7 +21,6 @@ class ArtificialPotentialField():
         self.get_agent_ids() # It is also possible to explicitly give id list without using this method
         self.vel_publishers = {}
         self.vel_commands = {}
-        self.obstacles = {}
         self.repulsive_pts = {}
         self.rate = rospy.Rate(100) # 10 Hz
         self.stop_velocity = Twist()
@@ -34,6 +33,11 @@ class ArtificialPotentialField():
         self.speed_limit = rospy.get_param("/artificial_potential_field/speed_limit")
         self.repulsive_threshold = rospy.get_param("/artificial_potential_field/repulsive_threshold")
         self.potential_field_timeout = rospy.get_param("/artificial_potential_field/potential_field_timeout")
+
+        # Get obstacles from params
+        self.obstacles = rospy.get_param("/obstacles")
+        self.obstacle_radius = rospy.get_param("/radius")
+        
 
         for agent in self.agents:
             self.agent_positions[agent["id"]] = agent["initialPosition"]
@@ -218,18 +222,13 @@ class ArtificialPotentialField():
                 z_distance = self.agent_positions[id][2] - self.obstacles[i][2]
                 y_distance = self.agent_positions[id][1] - self.obstacles[i][1]
                 x_distance = self.agent_positions[id][0] - self.obstacles[i][0]
-
-                z_distance = (z_distance - self.obstacles[i]) if (z_distance > 0 )else (z_distance + self.obstacles[i])
-                y_distance = (y_distance - self.obstacles[i]) if (y_distance > 0 )else (y_distance + self.obstacles[i])
-                x_distance = (x_distance - self.obstacles[i]) if (x_distance > 0 )else (x_distance + self.obstacles[i]) 
-
             
                 if z_distance != 0 and abs(z_distance) < self.repulsive_threshold:
-                    repulsive_force_z += (1/(z_distance**2))*(1/self.repulsive_threshold - 1/abs(z_distance))*self.repulsive_constant * (-(z_distance) / abs(z_distance))
+                    repulsive_force_z += (1/(z_distance**2))*(1/self.repulsive_threshold - 1/abs(z_distance))*(self.repulsive_constant) * (-(z_distance) / abs(z_distance))
                 if y_distance != 0 and abs(y_distance) < self.repulsive_threshold:
-                    repulsive_force_y += (1/(y_distance**2))*(1/self.repulsive_threshold - 1/abs(y_distance))*self.repulsive_constant * (-(y_distance) / abs(y_distance))
+                    repulsive_force_y += (1/(y_distance**2))*(1/self.repulsive_threshold - 1/abs(y_distance))*(self.repulsive_constant) * (-(y_distance) / abs(y_distance))
                 if x_distance != 0 and abs(x_distance) < self.repulsive_threshold:
-                    repulsive_force_x += (1/(x_distance**2))*(1/self.repulsive_threshold - 1/abs(x_distance))*self.repulsive_constant * (-(x_distance) / abs(x_distance))
+                    repulsive_force_x += (1/(x_distance**2))*(1/self.repulsive_threshold - 1/abs(x_distance))*(self.repulsive_constant) * (-(x_distance) / abs(x_distance))
 
         for key in self.repulsive_pts:
             z_distance = self.agent_positions[id][2] - self.repulsive_pts[key][2]

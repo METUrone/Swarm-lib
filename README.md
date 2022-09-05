@@ -51,9 +51,9 @@ source ~/.bashrc
 **Install Swarm-lib (Our Package)**
 
 ```
-mkdir -p Swarm_ws/src && cd Swarm_ws/src
+mkdir -p Swarm/src && cd Swarm/src
 git clone --branch gazebo https://github.com/METUrone/Swarm-lib.git --single-branch
-cd ~/Swarm_ws
+cd ~/Swarm
 catkin_make
 ```
 

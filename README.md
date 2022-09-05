@@ -1,5 +1,9 @@
 # Gazebo Simulation for Swarm-lib
 
+**Install ROS**
+
+from http://wiki.ros.org/noetic/Installation/Ubuntu
+
 **Install Dependencies**
 
 ```

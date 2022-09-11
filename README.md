@@ -59,7 +59,6 @@ catkin_make
 
 **Launch the Simulation**
 ```console
-catkin_make
 source devel/setup.bash
 roslaunch swarm gazebo.launch
 ```

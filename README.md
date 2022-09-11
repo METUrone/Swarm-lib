@@ -18,6 +18,7 @@ pip3 install empy toml numpy packaging jinja2
 pip3 install kconfiglib
 pip3 install --user jsonschema
 pip3 install munkres
+pip3 install --user pyros-genmsg
 ```
 ```
 sudo apt install python3-lxml libxml2-utils

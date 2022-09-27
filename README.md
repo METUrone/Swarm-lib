@@ -66,6 +66,60 @@ source devel/setup.bash
 roslaunch swarm gazebo.launch
 ```
 
+### Alternative: Install on a Docker Container
+1. Build a container
+
+```
+git clone https://github.com/PX4/PX4-containers.git
+cd PX4-containers/docker
+docker build -t px4io/px4-dev-ros-noetic -f Dockerfile_ros-noetic .
+```
+
+2. Run the following command to create a container, and run it.
+```
+echo 'xhost +local:docker' >> ~/.bashrc 
+source ~/.bashrc
+docker run -it -w /root/ -v ~/catkin_ws:/root/catkin_ws -v /tmp/.X11-unix:/tmp/.X11-unix:ro -e DISPLAY=${DISPLAY} -e --name=px4 px4io/px4-dev-ros-noetic bash
+```
+**Warning:** This command should be called only once. To run the same container later use the following commands. sudo docker start my-docker-container runs the container that we named my-docker-container. sudo docker exec -it my-docker-container bash opens a terminal where we can run commands in the running container.
+```
+sudo docker start px4
+sudo docker exec -it px4 bash
+```
+
+3.  Clone and build
+```
+git clone --branch release/1.12 https://github.com/PX4/PX4-Autopilot.git --single-branch 
+cd PX4-Autopilot
+DONT_RUN=1 make px4_sitl_default gazebo
+```
+4. Source PX4
+```
+cd ~
+
+echo "source $(pwd)/PX4-Autopilot/Tools/setup_gazebo.bash $(pwd)/PX4-Autopilot $(pwd)/PX4-Autopilot/build/px4_sitl_default" >> ~/.bashrc
+echo "export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd)/PX4-Autopilot" >> .bashrc
+echo "export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd)/PX4-Autopilot/Tools/sitl_gazebo" >> ~/.bashrc
+
+source ~/.bashrc
+```
+```
+pip3 install munkres
+```
+
+5. Install Swarm-lib (Our Package)*
+```
+mkdir -p Swarm/src && cd Swarm/src
+git clone --branch gazebo https://github.com/METUrone/Swarm-lib.git --single-branch
+cd ~/Swarm
+catkin_make
+```
+6. Launch the Simulation
+```console
+source devel/setup.bash
+roslaunch swarm gazebo.launch
+```
+
 # Basic Structure
 This package consists of two main parts artificial_potential_field.py and iris_controller.py. artificial_potential_field nodes subscribes to current poses of uav{uav_id}/mavros/local_position/pose topic whose publisher is mavros, and publishes the instant velocity for each agent via {uav_id}/vel_commander topic. Then iris_controller node takes these velocity commands, send them to PX4 controller via /uav0/mavros/setpoint_velocity/cmd_vel_unstamped topic and publishes resulting poses to {uad_id}/position topic whose subscriber is artificial_potential_field node. This cycle continues until all tasks are achieved.
 

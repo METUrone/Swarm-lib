@@ -137,3 +137,13 @@ Here is an example run of a simulation where agents are performing forming forma
 
 https://drive.google.com/file/d/1jfvP-AinxXbAPjuOdyk524cK3rmOSeiJ/view?usp=sharing
 
+# Comman Issues:
+
+- If you cannot see drones in the gazebo simulation try running these first to kill previously opened gazebo processes:
+```
+killall gzserver
+killall gzclient
+```
+
+- If you are getting cc1plus error during building PX4 try running the same build command with the `-j 4` flag to limit the cpu usage.
+

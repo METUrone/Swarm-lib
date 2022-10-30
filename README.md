@@ -145,5 +145,5 @@ killall gzserver
 killall gzclient
 ```
 
-- If you are getting cc1plus error during building PX4 try running the same build command with the `-j 4` flag to limit the cpu usage.
+- If you are getting cc1plus error during building PX4 try running the same build command with the `-j4` flag to limit the cpu usage.
 

@@ -380,4 +380,37 @@ class ArtificialPotentialField():
             
             print(coordinates)
             self.form_coordinates(coordinates=coordinates)
-
+    def form_v(self,radius,h=0.5,angle=60,displacement=np.zeros(3),direction=0,num_of_agents=-1):
+        #radius is distance between two closest agent
+        #angle is the angle between two wings of V
+        #direction is the rotated coordinates with respect to head of the V
+        if num_of_agents==-1:
+            num_of_agents=self.num_of_drones
+        angle=degree_to_radian(angle)
+        coordinates=np.zeros((num_of_agents,3))
+        coordinates[0]=np.array([displacement[0],displacement[1],h+displacement[2]])
+        angle_to_used=angle/2
+        second_wing_modifier=num_of_agents//2+1
+        if not (num_of_agents%2):#if it is certain that for V form num o agents will be odd, then this whole if block can be omitted
+            x=(-(num_of_agents/2)*math.sin(angle_to_used)*radius)
+            y=(-(num_of_agents/2)*math.cos(angle_to_used)*radius)
+            z=h+displacement[2]
+            coordinates[num_of_agents-1][0]=x+displacement[0]
+            coordinates[num_of_agents-1][1]=y+displacement[1]
+            coordinates[num_of_agents-1][2]=z
+            second_wing_modifier-=1
+        for i in range((num_of_agents-1)//2):
+            x=(-(i+1)*math.sin(angle_to_used)*radius)
+            y=(-(i+1)*math.cos(angle_to_used)*radius)
+            z=h+displacement[2]
+            coordinates[i+1][0]=x+displacement[0]
+            coordinates[i+1][1]=y+displacement[1]
+            coordinates[i+1][2]=z
+            coordinates[i+second_wing_modifier][0]=-x+displacement[0]
+            coordinates[i+second_wing_modifier][1]=y+displacement[1]
+            coordinates[i+second_wing_modifier][2]=z
+        if direction:
+            coordinates=rotate_coordinates_wrt_to(coordinates=coordinates,angle=direction,point=[displacement[0],displacement[1]])
+        coordinates=self.sort_coordinates(coordinates=coordinates)
+        print(coordinates)
+        self.form_coordinates(coordinates=coordinates)

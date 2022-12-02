@@ -97,6 +97,20 @@ def rotate_coordinates(coordinates, angle):
 
     return result
 
+
+def rotate_coordinates_wrt_to(coordinates,angle,point=np.zeros(2)):
+    angle = degree_to_radian(angle)
+    coordinates_respect_to_point=[]
+    rot=np.array([[cos(angle), -sin(angle)], [sin(angle), cos(angle)]])
+    result=[]
+    for coordinate in coordinates:
+        coordinates_respect_to_point.append([coordinate[0]- point[0], coordinate[1]- point[1]])
+    for i in range(len(coordinates_respect_to_point)):
+        result.append([np.dot(rot, coordinates_respect_to_point[i])+np.array([point[0],point[1],coordinates[i][2]])])
+    return np.array(result)
+
+
+
 def write_mission(content):
     content = str(content)
     f = open("mission.txt", "a")

@@ -423,3 +423,24 @@ class ArtificialPotentialField():
         coordinates=self.sort_coordinates(coordinates=coordinates)
         print(coordinates)
         self.form_coordinates(coordinates=coordinates)
+    def form_star(self,radius,h=0.5,displacement=np.zeros(3)):
+        deg_36=math.pi/5
+        deg_54=3*math.pi/10
+        deg__18=math.pi/10
+        deg_72=2*math.pi/5
+        radius_2=radius/(2*math.cos(deg_36))
+        displacement=np.array(displacement)
+        coordinates=np.zeros((10,3))
+        coordinates[0]=np.array([radius*math.cos(deg_54),-radius*math.sin(deg_54),h])
+        coordinates[4]=np.array([-radius*math.cos(deg_54),-radius*math.sin(deg_54),h])
+        coordinates[1]=np.array([radius*math.sin(deg_72),radius*math.cos(deg_72),h])
+        coordinates[3]=np.array([-radius*math.sin(deg_72),radius*math.cos(deg_72),h])
+        coordinates[2]=np.array([0,radius,h])
+        coordinates[5]=np.array([radius_2*math.cos(deg__18),-radius_2*math.sin(deg__18),h])
+        coordinates[9]=np.array([-radius_2*math.cos(deg__18),-radius_2*math.sin(deg__18),h])
+        coordinates[6]=np.array([radius_2*math.sin(deg_36),radius_2*math.cos(deg_36),h])
+        coordinates[8]=np.array([-radius_2*math.sin(deg_36),radius_2*math.cos(deg_36),h])
+        coordinates[7]=np.array([0,-radius_2,h])
+        coordinates=self.sort_coordinates(coordinates=coordinates)
+        print(coordinates)
+        self.form_coordinates(coordinates=coordinates)

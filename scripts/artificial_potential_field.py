@@ -388,6 +388,7 @@ class ArtificialPotentialField():
             num_of_agents=self.num_of_drones
         angle=degree_to_radian(angle)
         coordinates=np.zeros((num_of_agents,3))
+        center_displacement_vector=np.zeros(3)
         coordinates[0]=np.array([displacement[0],displacement[1],h+displacement[2]])
         angle_to_used=angle/2
         second_wing_modifier=num_of_agents//2+1
@@ -399,6 +400,7 @@ class ArtificialPotentialField():
             coordinates[num_of_agents-1][1]=y+displacement[1]
             coordinates[num_of_agents-1][2]=z
             second_wing_modifier-=1
+            center_displacement_vector=np.array([x,y,z])
         for i in range((num_of_agents-1)//2):
             x=(-(i+1)*math.sin(angle_to_used)*radius)
             y=(-(i+1)*math.cos(angle_to_used)*radius)
@@ -409,8 +411,36 @@ class ArtificialPotentialField():
             coordinates[i+second_wing_modifier][0]=-x+displacement[0]
             coordinates[i+second_wing_modifier][1]=y+displacement[1]
             coordinates[i+second_wing_modifier][2]=z
+            center_displacement_vector[1]+=2*y
+            center_displacement_vector[2]+=2*z
+        center_displacement_vector[0]/=num_of_agents
+        center_displacement_vector[1]/=num_of_agents
+        center_displacement_vector[2]/=num_of_agents
+        for i in range(num_of_agents):
+            coordinates[i]=coordinates[i]-center_displacement_vector
         if direction:
-            coordinates=rotate_coordinates_wrt_to(coordinates=coordinates,angle=direction,point=[displacement[0],displacement[1]])
+            coordinates=rotate_coordinates(coordinates=coordinates,angle=direction)
+        coordinates=self.sort_coordinates(coordinates=coordinates)
+        print(coordinates)
+        self.form_coordinates(coordinates=coordinates)
+    def form_star(self,radius,h=0.5,displacement=np.zeros(3)):
+        deg_36=math.pi/5
+        deg_54=3*math.pi/10
+        deg__18=math.pi/10
+        deg_72=2*math.pi/5
+        radius_2=radius/(2*math.cos(deg_36))
+        displacement=np.array(displacement)
+        coordinates=np.zeros((10,3))
+        coordinates[0]=np.array([radius*math.cos(deg_54),-radius*math.sin(deg_54),h])
+        coordinates[4]=np.array([-radius*math.cos(deg_54),-radius*math.sin(deg_54),h])
+        coordinates[1]=np.array([radius*math.sin(deg_72),radius*math.cos(deg_72),h])
+        coordinates[3]=np.array([-radius*math.sin(deg_72),radius*math.cos(deg_72),h])
+        coordinates[2]=np.array([0,radius,h])
+        coordinates[5]=np.array([radius_2*math.cos(deg__18),-radius_2*math.sin(deg__18),h])
+        coordinates[9]=np.array([-radius_2*math.cos(deg__18),-radius_2*math.sin(deg__18),h])
+        coordinates[6]=np.array([radius_2*math.sin(deg_36),radius_2*math.cos(deg_36),h])
+        coordinates[8]=np.array([-radius_2*math.sin(deg_36),radius_2*math.cos(deg_36),h])
+        coordinates[7]=np.array([0,-radius_2,h])
         coordinates=self.sort_coordinates(coordinates=coordinates)
         print(coordinates)
         self.form_coordinates(coordinates=coordinates)

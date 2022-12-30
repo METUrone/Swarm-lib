@@ -132,6 +132,23 @@ def read_mission():
         mission.append(line.split(" "))
     return mission
 
+def array_to_real_positions(coords, max_height, origin=[0,0], scale=[1,1]):
+    for pos in coords:
+        #reverse array row indices
+        pos[1] = max_height - pos[1] 
+
+        #shift origin
+        pos[0] = pos[0] - origin[0] 
+        pos[1] = pos[1] - origin[1]
+
+        #center cells
+        pos[0] += 0.5
+        pos[1] += 0.5
+
+        #scale
+        pos[0] *= scale[0]
+        pos[1] *= scale[1]
+        
 # function to limit velocity while keeping the same direction
 
 

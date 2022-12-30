@@ -363,10 +363,11 @@ class ArtificialPotentialField():
             rospy.sleep(duration/step)
             self.form_coordinates(rotated_coordinates)    
 
-    def form_3d(self, radius, num_edges, h=0.5):
-        if num_edges == "prism":
-
-            coordinates = self.sort_coordinates(np.concatenate((self.formation_coordinates(0, 1, height=radius+h)
+    def form_3d(self, radius, num_edges, h=0.5,obj_h=-1):
+        if num_edges == "pyramid":
+            if obj_h==-1:
+                obj_h=radius
+            coordinates = self.sort_coordinates(np.concatenate((self.formation_coordinates(0, 1, height=obj_h+h)
             , self.formation_coordinates(radius, self.num_of_drones-1, height=h))))
 
             print(coordinates)
@@ -375,8 +376,10 @@ class ArtificialPotentialField():
         elif num_edges == "cylinder": # Here circle function can be used.
             pass
         else:
+            if obj_h==-1:
+                obj_h=radius
             coordinates = self.sort_coordinates(np.concatenate((self.formation_coordinates(distance_between=radius
-            , num_of_edges=num_edges, height=1.5), self.formation_coordinates(radius, num_of_edges=num_edges, height=0.5))))
+            , num_of_edges=num_edges, height=obj_h+h), self.formation_coordinates(radius, num_of_edges=num_edges, height=h))))
             
             print(coordinates)
             self.form_coordinates(coordinates=coordinates)

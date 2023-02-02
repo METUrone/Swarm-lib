@@ -374,7 +374,12 @@ class ArtificialPotentialField():
             self.form_coordinates(coordinates=coordinates)
             
         elif num_edges == "cylinder": # Here circle function can be used.
-            pass
+            if obj_h==-1:
+                obj_h=radius
+            lower_plane_coordinates=self.formation_coordinates(radius,int((self.num_of_drones-2)/2),height=h)
+            upper_plane_coordinates=self.formation_coordinates(radius,int((self.num_of_drones-2)/2),height=h+obj_h*2)
+            middle_plane_coordinates=np.array(((lower_plane_coordinates[0]+(0,0,obj_h)),(lower_plane_coordinates[int((self.num_of_drones-2)/4)]+(0,0,obj_h))))
+            self.form_coordinates(coordinates=self.sort_coordinates(np.concatenate((lower_plane_coordinates,upper_plane_coordinates,middle_plane_coordinates))))
         else:
             if obj_h==-1:
                 obj_h=radius

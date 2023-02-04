@@ -151,76 +151,76 @@ killall gzclient
 
 The Artificial Potential Field file has one class ArtificialPotentialField and ArtificialPotentialField class has 24 functions:
 
-1-Initializing function(__init__)
+**1-Initializing function(__init__)**
 Initializes a node in ROS called "artificial_potential_field". Initializes agents according to the parameters from algorithm_params.yaml with velocity 0. Initializes obstacles from params. Then waits for all drones to be ready.
 
-2-limit_velocity
+**2-limit_velocity**
 Takes the current velocity(velocity_twist) and max velocity(max_velocity) as parameters. If the current velocity is bigger than max velocity, decreases the current velocity to max velocity while maintaining the direction.
 
-3-get_agent_ids
+**3-get_agent_ids**
 Returns an array of agent ids.
 
-4-position_callback
+**4-position_callback**
 Takes position data(data) and id of agent(id) and updates the position of agent with said id to received position data.
 
-5-send_vel_commands
+**5-send_vel_commands**
 Publishes the Twist velocities to each drone.
 
-6-vel_commander_loop
+**6-vel_commander_loop**
 Publishes Twist velocities to drones continuously while ROS is working.
 
-7-obstacle_creator_without_drones
+**7-obstacle_creator_without_drones**
 Takes an array of obstacles(array_of_obstacles) and obstacle radius(obstacle_radius)(default is 0.1) and appends these obstacles to the classes obstacles array and numpy array. 
 
-8-sort_coordinates
+**8-sort_coordinates**
 
 
-9-is_goal_reached
+**9-is_goal_reached**
 Takes the id of drone(id) and and a numpy array representing goal(goal), and returns whether the drone has reached the goal or not with a 15 cm error radius.
 
-10-is_formed
+**10-is_formed**
 Takes a numpy array representing goals(goals) and checks for every drone whether the drone has reached the goal or not. If all drones have reached the goal, returns True, else False. 
 
-11-formation_coordinates
+**11-formation_coordinates**
 Takes number of edges(num_of_edges), distance between drones(distance_between), height(height)(default is 1), a displacement array(displacement)(default is a numpy array of zeroes) and rotation angle(rotation_angle)(defualt is 0) of the formation and returns an array of vectors that will create this formation.
 
-12-attractive_force
+**12-attractive_force**
 Takes id of drone(id) and target position(target_pose) and returns the attractive force vector according to Artificial Potential Field algorithm for the drone.
 
-13-repulsive_force
+**13-repulsive_force**
 Takes id of drone(id) and according to Artificial Potential Field algorithm and the array of obstacles, returns repulsive force vector for the drone.
 
-14-single_potential_field
+**14-single_potential_field**
 Takes id of one drone(id), finds attractive and repulsive forces of the drone and updates its velocity according to found attractive and repulsive forces. 
 
-15-form_via_potential_field
+**15-form_via_potential_field**
 Takes radius of formation(radius) and a displacement vector(displacement)(default is an array of zeroes) and uses Artificial Potential Field algorithm and formation_coordinates function with default variables to create the formation. When the formation is complete, logs "Formation complete".
 
-16-stop_all
+**16-stop_all**
 Stops all drones by setting the velocities to zero.
 
-17-form_polygon
+**17-form_polygon**
 Takes radius of polygon formation(radius) and a displacement vector(displacement)(default is an array of zeroes) and uses Artificial Potential Field algorithm and formation_coordinates function with default variables to form the polygon.
 
-18-form_coordinates
+**18-form_coordinates**
 Takes an array of coordinates(coordinates) and forms coordinates by Artificial Potential Field algorithm.
 
-19-go
+**19-go**
 Takes a vector(vector) and moves all drones by this vector.  
 
-20-rotate
+**20-rotate**
 Takes degree of rotation(degree), step amount of rotation(step)(default is 10) and duration of the rotation(duration)(default is 3) and rotates all drones around a point according to the variables.
 
-21-form_3d
+**21-form_3d**
 Takes radius of the formation(radius), string information of formation(num_edges) and height(h). Here num_edges can either be "prism" or "cylinder". Cylinder formation is not initialized yet in this function. For prism formation, it uses form_coordinates function to form a prism formation.
 
-22-form_v
+**22-form_v**
 Takes the distance between two closest agents(radius), angle between two wings of V(angle)(default is 60 degrees), height(h)(default is 0.5), the direction of the formation(direction)(default is 0) and number of agents(num_of_agents)(default is -1) and forms a V formation by calculating relevant coordinates and using form_coordinates function.
 
-23-form_star
+**23-form_star**
 Takes radius of formation(radius), height(h) and a displacement vector(displacement)(default is an array of zeroes) and forms a star formation by calculating relevant coordinates and using form_coordinates function.
 
-24-surround_fire
+**24-surround_fire**
 Gives drones coordinates to surround the fire according to the fire coordinates obtained via computer vision.
 
 

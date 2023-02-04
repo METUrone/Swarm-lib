@@ -363,20 +363,28 @@ class ArtificialPotentialField():
             rospy.sleep(duration/step)
             self.form_coordinates(rotated_coordinates)    
 
-    def form_3d(self, radius, num_edges, h=0.5):
-        if num_edges == "prism":
-
-            coordinates = self.sort_coordinates(np.concatenate((self.formation_coordinates(0, 1, height=radius+h)
+    def form_3d(self, radius, num_edges, h=0.5,obj_h=-1):
+        if num_edges == "pyramid":
+            if obj_h==-1:
+                obj_h=radius
+            coordinates = self.sort_coordinates(np.concatenate((self.formation_coordinates(0, 1, height=obj_h+h)
             , self.formation_coordinates(radius, self.num_of_drones-1, height=h))))
 
             print(coordinates)
             self.form_coordinates(coordinates=coordinates)
             
         elif num_edges == "cylinder": # Here circle function can be used.
-            pass
+            if obj_h==-1:
+                obj_h=radius
+            lower_plane_coordinates=self.formation_coordinates(radius,int((self.num_of_drones-2)/2),height=h)
+            upper_plane_coordinates=self.formation_coordinates(radius,int((self.num_of_drones-2)/2),height=h+obj_h)
+            middle_plane_coordinates=np.array(((lower_plane_coordinates[0]+(0,0,obj_h/2)),(lower_plane_coordinates[int((self.num_of_drones-2)/4)]+(0,0,obj_h/2))))
+            self.form_coordinates(coordinates=self.sort_coordinates(np.concatenate((lower_plane_coordinates,upper_plane_coordinates,middle_plane_coordinates))))
         else:
+            if obj_h==-1:
+                obj_h=radius
             coordinates = self.sort_coordinates(np.concatenate((self.formation_coordinates(distance_between=radius
-            , num_of_edges=num_edges, height=1.5), self.formation_coordinates(radius, num_of_edges=num_edges, height=0.5))))
+            , num_of_edges=num_edges, height=obj_h+h), self.formation_coordinates(radius, num_of_edges=num_edges, height=h))))
             
             print(coordinates)
             self.form_coordinates(coordinates=coordinates)
@@ -431,16 +439,16 @@ class ArtificialPotentialField():
         radius_2=radius/(2*math.cos(deg_36))
         displacement=np.array(displacement)
         coordinates=np.zeros((10,3))
-        coordinates[0]=np.array([radius*math.cos(deg_54),-radius*math.sin(deg_54),h])
-        coordinates[4]=np.array([-radius*math.cos(deg_54),-radius*math.sin(deg_54),h])
-        coordinates[1]=np.array([radius*math.sin(deg_72),radius*math.cos(deg_72),h])
-        coordinates[3]=np.array([-radius*math.sin(deg_72),radius*math.cos(deg_72),h])
-        coordinates[2]=np.array([0,radius,h])
-        coordinates[5]=np.array([radius_2*math.cos(deg__18),-radius_2*math.sin(deg__18),h])
-        coordinates[9]=np.array([-radius_2*math.cos(deg__18),-radius_2*math.sin(deg__18),h])
-        coordinates[6]=np.array([radius_2*math.sin(deg_36),radius_2*math.cos(deg_36),h])
-        coordinates[8]=np.array([-radius_2*math.sin(deg_36),radius_2*math.cos(deg_36),h])
-        coordinates[7]=np.array([0,-radius_2,h])
+        coordinates[0]=np.array([radius*math.cos(deg_54),-radius*math.sin(deg_54),h])+displacement
+        coordinates[4]=np.array([-radius*math.cos(deg_54),-radius*math.sin(deg_54),h])+displacement
+        coordinates[1]=np.array([radius*math.sin(deg_72),radius*math.cos(deg_72),h])+displacement
+        coordinates[3]=np.array([-radius*math.sin(deg_72),radius*math.cos(deg_72),h])+displacement
+        coordinates[2]=np.array([0,radius,h])+displacement
+        coordinates[5]=np.array([radius_2*math.cos(deg__18),-radius_2*math.sin(deg__18),h])+displacement
+        coordinates[9]=np.array([-radius_2*math.cos(deg__18),-radius_2*math.sin(deg__18),h])+displacement
+        coordinates[6]=np.array([radius_2*math.sin(deg_36),radius_2*math.cos(deg_36),h])+displacement
+        coordinates[8]=np.array([-radius_2*math.sin(deg_36),radius_2*math.cos(deg_36),h])+displacement
+        coordinates[7]=np.array([0,-radius_2,h])+displacement
         coordinates=self.sort_coordinates(coordinates=coordinates)
         print(coordinates)
         self.form_coordinates(coordinates=coordinates)

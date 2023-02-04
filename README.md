@@ -147,7 +147,7 @@ killall gzclient
 
 - If you are getting cc1plus error during building PX4 try running the same build command with the `-j4` flag to limit the cpu usage.
 
-#Code Explanations
+# Code Explanations
 
 The Artificial Potential Field file has one class ArtificialPotentialField and ArtificialPotentialField class has 24 functions:
 

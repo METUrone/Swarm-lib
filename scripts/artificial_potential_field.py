@@ -11,7 +11,6 @@ from geometry_msgs.msg import PoseStamped, Twist
 from threading import Thread
 
 
-
 class ArtificialPotentialField():
     def __init__(self):
 
@@ -453,7 +452,7 @@ class ArtificialPotentialField():
         print(coordinates)
         self.form_coordinates(coordinates=coordinates)
     
-    def surround_fire(self, field, agent_count):
+    def surround_fire(self, field, agent_count=-1):
         circumference = []
         positions = []
         sorted_positions = []
@@ -463,6 +462,12 @@ class ArtificialPotentialField():
 
         real_width = 3.5
         real_height = 3.5
+
+        z = self.agent_positions[self.agent_ids[0]][2]
+        agent_size = 0.1 * width / real_width 
+
+        if agent_count == -1:
+            agent_count = self.num_of_drones
 
         for i in range(0, width):
             for j in range(0, height):
@@ -476,12 +481,12 @@ class ArtificialPotentialField():
                             continue
                         
                         if field[jj][ii] and [ii, jj] not in circumference:
-                            circumference.append([ii, jj])
+                            circumference.append([ii, jj, z])
 
         agent_dist = len(circumference) / agent_count #optimum distance between agents
         sorted_positions.append(circumference[0])
         
-        print("Minimum distance between agents: ", agent_dist, "\n")
+        #print("Minimum distance between agents: ", agent_dist, "\n")
 
         for _ in range(0, len(circumference)-1):
             min_dist = 99999
@@ -497,7 +502,7 @@ class ArtificialPotentialField():
 
             sorted_positions.append(next_pos)
         
-        print("Sorted positions: ", sorted_positions, "\n")
+        #print("Sorted positions: ", sorted_positions, "\n")
         
         positions.append(sorted_positions[0])
         for i in range(1, agent_count):
@@ -510,9 +515,20 @@ class ArtificialPotentialField():
             k1 = 1 - (agent_dist - int(agent_dist));
             k2 = 1 - k1;
 
-            x = min[0]*k1 + max[0]*k2
-            y = min[1]*k1 + max[1]*k2
-            positions.append([x, y]);
+            x = min[0]*k1 + max[0]*k2 + 0.5
+            y = min[1]*k1 + max[1]*k2 + 0.5
+
+            if not field[int(x+agent_size)][int(y)]: #check right
+                x -= agent_size
+            elif not field[int(x-agent_size)][int(y)]: #check left
+                x += agent_size
+
+            if not field[int(x)][int(y+agent_size)]: #check up
+                y -= agent_size
+            elif not field[int(x)][int(y-agent_size)]: #check down
+                y += agent_size
+
+            positions.append([x, y, z])
 
         array_to_real_positions(positions, height, origin=[width/2, height/2], scale=[real_width / width, real_height / height])
         positions = self.sort_coordinates(positions)

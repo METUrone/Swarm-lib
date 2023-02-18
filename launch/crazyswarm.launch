@@ -9,6 +9,8 @@
 
     <node pkg="swarm" type="crazyswarm_controller.py" name="crazyswarm_controller" output="screen" args="$(arg sim)"/>
     
+    <!-- <node pkg="swarm" type="camera.py" name="camera" output="screen"/> -->
+    
     <node pkg="swarm" type="mission_planner.py" name="mission_planner" output="screen"/>
     
 

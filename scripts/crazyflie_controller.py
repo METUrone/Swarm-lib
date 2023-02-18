@@ -164,7 +164,7 @@ if __name__ == '__main__':
         check_battery_status()
 
 
-        # start_missions()
+        start_missions()
 
 
         sys.exit(-1)

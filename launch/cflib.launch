@@ -3,7 +3,7 @@
 
     <rosparam command="load" file="$(find swarm)/config/crazyflies.yaml"/>
 
-    <!-- node pkg="swarm" type="crazyswarm_controller.py" name="crazyswarm_controller" output="screen" args="$(arg sim)"/ -->
+    <node pkg="swarm" type="crazyswarm_controller.py" name="crazyswarm_controller" output="screen" args="$(arg sim)"/>
     
     <node pkg="swarm" type="crazyflie_controller.py" name="crazyflie_controller" output="screen"/>
 

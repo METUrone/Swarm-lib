@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+
+import sys
+import os
+username = os.getlogin()
+sys.path.append(f"/home/{username}/crazyswarm/ros_ws/src/crazyswarm/scripts")
+
 import rospy
 from pycrazyswarm import Crazyswarm
 from geometry_msgs.msg import PoseStamped, Twist

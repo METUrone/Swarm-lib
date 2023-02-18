@@ -363,20 +363,158 @@ class ArtificialPotentialField():
             rospy.sleep(duration/step)
             self.form_coordinates(rotated_coordinates)    
 
-    def form_3d(self, radius, num_edges, h=0.5):
-        if num_edges == "prism":
-
-            coordinates = self.sort_coordinates(np.concatenate((self.formation_coordinates(0, 1, height=radius+h)
+    def form_3d(self, radius, num_edges, h=0.5,obj_h=-1):
+        if num_edges == "pyramid":
+            if obj_h==-1:
+                obj_h=radius
+            coordinates = self.sort_coordinates(np.concatenate((self.formation_coordinates(0, 1, height=obj_h+h)
             , self.formation_coordinates(radius, self.num_of_drones-1, height=h))))
 
             print(coordinates)
             self.form_coordinates(coordinates=coordinates)
             
         elif num_edges == "cylinder": # Here circle function can be used.
-            pass
+            if obj_h==-1:
+                obj_h=radius
+            lower_plane_coordinates=self.formation_coordinates(radius,int((self.num_of_drones-2)/2),height=h)
+            upper_plane_coordinates=self.formation_coordinates(radius,int((self.num_of_drones-2)/2),height=h+obj_h)
+            middle_plane_coordinates=np.array(((lower_plane_coordinates[0]+(0,0,obj_h/2)),(lower_plane_coordinates[int((self.num_of_drones-2)/4)]+(0,0,obj_h/2))))
+            self.form_coordinates(coordinates=self.sort_coordinates(np.concatenate((lower_plane_coordinates,upper_plane_coordinates,middle_plane_coordinates))))
         else:
+            if obj_h==-1:
+                obj_h=radius
             coordinates = self.sort_coordinates(np.concatenate((self.formation_coordinates(distance_between=radius
-            , num_of_edges=num_edges, height=1.5), self.formation_coordinates(radius, num_of_edges=num_edges, height=0.5))))
+            , num_of_edges=num_edges, height=obj_h+h), self.formation_coordinates(radius, num_of_edges=num_edges, height=h))))
             
             print(coordinates)
             self.form_coordinates(coordinates=coordinates)
+            
+    def form_v(self,radius,h=0.5,angle=60,displacement=np.zeros(3),direction=0,num_of_agents=-1):
+        #radius is distance between two closest agent
+        #angle is the angle between two wings of V
+        #direction is the rotated coordinates with respect to head of the V
+        if num_of_agents==-1:
+            num_of_agents=self.num_of_drones
+        angle=degree_to_radian(angle)
+        coordinates=np.zeros((num_of_agents,3))
+        center_displacement_vector=np.zeros(3)
+        coordinates[0]=np.array([displacement[0],displacement[1],h+displacement[2]])
+        angle_to_used=angle/2
+        second_wing_modifier=num_of_agents//2+1
+        if not (num_of_agents%2):#if it is certain that for V form num o agents will be odd, then this whole if block can be omitted
+            x=(-(num_of_agents/2)*math.sin(angle_to_used)*radius)
+            y=(-(num_of_agents/2)*math.cos(angle_to_used)*radius)
+            z=h+displacement[2]
+            coordinates[num_of_agents-1][0]=x+displacement[0]
+            coordinates[num_of_agents-1][1]=y+displacement[1]
+            coordinates[num_of_agents-1][2]=z
+            second_wing_modifier-=1
+            center_displacement_vector=np.array([x,y,z])
+        for i in range((num_of_agents-1)//2):
+            x=(-(i+1)*math.sin(angle_to_used)*radius)
+            y=(-(i+1)*math.cos(angle_to_used)*radius)
+            z=h+displacement[2]
+            coordinates[i+1][0]=x+displacement[0]
+            coordinates[i+1][1]=y+displacement[1]
+            coordinates[i+1][2]=z
+            coordinates[i+second_wing_modifier][0]=-x+displacement[0]
+            coordinates[i+second_wing_modifier][1]=y+displacement[1]
+            coordinates[i+second_wing_modifier][2]=z
+            center_displacement_vector[1]+=2*y
+            center_displacement_vector[2]+=2*z
+        center_displacement_vector[0]/=num_of_agents
+        center_displacement_vector[1]/=num_of_agents
+        center_displacement_vector[2]/=num_of_agents
+        for i in range(num_of_agents):
+            coordinates[i]=coordinates[i]-center_displacement_vector
+        if direction:
+            coordinates=rotate_coordinates(coordinates=coordinates,angle=direction)
+        coordinates=self.sort_coordinates(coordinates=coordinates)
+        print(coordinates)
+        self.form_coordinates(coordinates=coordinates)
+    def form_star(self,radius,h=0.5,displacement=np.zeros(3)):
+        deg_36=math.pi/5
+        deg_54=3*math.pi/10
+        deg__18=math.pi/10
+        deg_72=2*math.pi/5
+        radius_2=radius/(2*math.cos(deg_36))
+        displacement=np.array(displacement)
+        coordinates=np.zeros((10,3))
+        coordinates[0]=np.array([radius*math.cos(deg_54),-radius*math.sin(deg_54),h])+displacement
+        coordinates[4]=np.array([-radius*math.cos(deg_54),-radius*math.sin(deg_54),h])+displacement
+        coordinates[1]=np.array([radius*math.sin(deg_72),radius*math.cos(deg_72),h])+displacement
+        coordinates[3]=np.array([-radius*math.sin(deg_72),radius*math.cos(deg_72),h])+displacement
+        coordinates[2]=np.array([0,radius,h])+displacement
+        coordinates[5]=np.array([radius_2*math.cos(deg__18),-radius_2*math.sin(deg__18),h])+displacement
+        coordinates[9]=np.array([-radius_2*math.cos(deg__18),-radius_2*math.sin(deg__18),h])+displacement
+        coordinates[6]=np.array([radius_2*math.sin(deg_36),radius_2*math.cos(deg_36),h])+displacement
+        coordinates[8]=np.array([-radius_2*math.sin(deg_36),radius_2*math.cos(deg_36),h])+displacement
+        coordinates[7]=np.array([0,-radius_2,h])+displacement
+        coordinates=self.sort_coordinates(coordinates=coordinates)
+        print(coordinates)
+        self.form_coordinates(coordinates=coordinates)
+    
+    def surround_fire(self, field, agent_count):
+        circumference = []
+        positions = []
+        sorted_positions = []
+
+        width = len(field[0])
+        height = len(field)
+
+        real_width = 3.5
+        real_height = 3.5
+
+        for i in range(0, width):
+            for j in range(0, height):
+                if field[j][i]: #only check False items (fire zone)
+                    continue
+                
+                #check neighbours of False items (3x3)
+                for ii in range(i - 1, i + 2):
+                    for jj in range(j - 1, j + 2):
+                        if ii < 0 or ii >= width or jj < 0 or jj >= height:
+                            continue
+                        
+                        if field[jj][ii] and [ii, jj] not in circumference:
+                            circumference.append([ii, jj])
+
+        agent_dist = len(circumference) / agent_count #optimum distance between agents
+        sorted_positions.append(circumference[0])
+        
+        print("Minimum distance between agents: ", agent_dist, "\n")
+
+        for _ in range(0, len(circumference)-1):
+            min_dist = 99999
+            cur_pos = sorted_positions[-1]
+            circumference.remove(cur_pos)
+            next_pos = None
+            
+            for p in circumference:
+                d = abs(cur_pos[0]-p[0]) + abs(cur_pos[1] - p[1]) #taxicab distance
+                if d < min_dist:
+                    min_dist = d
+                    next_pos = p
+
+            sorted_positions.append(next_pos)
+        
+        print("Sorted positions: ", sorted_positions, "\n")
+        
+        positions.append(sorted_positions[0])
+        for i in range(1, agent_count):
+            lowi = int(i*agent_dist)
+            highi = int(i*agent_dist) + 1
+
+            min = sorted_positions[lowi]
+            max = sorted_positions[highi]
+
+            k1 = 1 - (agent_dist - int(agent_dist));
+            k2 = 1 - k1;
+
+            x = min[0]*k1 + max[0]*k2
+            y = min[1]*k1 + max[1]*k2
+            positions.append([x, y]);
+
+        array_to_real_positions(positions, height, origin=[width/2, height/2], scale=[real_width / width, real_height / height])
+        positions = self.sort_coordinates(positions)
+        self.form_coordinates(positions)

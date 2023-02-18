@@ -147,3 +147,8 @@ killall gzclient
 
 - If you are getting cc1plus error during building PX4 try running the same build command with the `-j4` flag to limit the cpu usage.
 
+- If pycrazyswarm is not found by python run the following:
+```
+echo >> ~/.bashrc "export PYTHONPATH=$PYTHONPATH:~/crazyswarm/ros_ws/src/crazyswarm/scripts" && . ~/.bashrc
+```
+

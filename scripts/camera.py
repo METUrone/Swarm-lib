@@ -2,9 +2,11 @@
 import cv2 as cv
 import numpy as np
 import rospy
-from first_pkg.srv import fireareacoordinates
+from swarm.srv import FireData
+
 rospy.init_node("redgrid_client",anonymous=True)
-service_name=None
+service_name = "firedata"
+
 class Red_object:
     def __init__(self,number_of_division=20, path = "test.png"):
         self.division_number=number_of_division
@@ -77,7 +79,7 @@ if __name__=="__main__":
     grid=a.result()
     division=a.division_number
     rospy.wait_for_service(service_name)
-    client=rospy.ServiceProxy(service_name, fireareacoordinates)
+    client=rospy.ServiceProxy(service_name, FireData)
     client.call(division,grid)
 
 

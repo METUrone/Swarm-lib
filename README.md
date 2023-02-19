@@ -152,3 +152,19 @@ killall gzclient
 echo >> ~/.bashrc "export PYTHONPATH=$PYTHONPATH:~/crazyswarm/ros_ws/src/crazyswarm/scripts" && . ~/.bashrc
 ```
 
+- If crazyswarm package is not found it is because it has not been sourced and once you source this ws it will be overwritten. So to solve the problem go to the source of this workspace and follow the below commands.
+
+First source crazyswarm. The command will only work if you have clone crazyswarm to home dir. If you have not, chage the path.
+
+```
+. ~/crazyswarm/ros_ws/devel/setup.bash
+```
+
+Then rebuild your ws.
+
+```
+rm -rf /build /devel && \
+catkin_make && \
+. devel/setup.bash
+```
+

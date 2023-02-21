@@ -510,7 +510,7 @@ class ArtificialPotentialField():
         positions = self.sort_coordinates(positions)
         self.form_coordinates(positions)
         
-    def land_swarm_inorder(self, error = 0.05):
+    def land_swarm_inorder(self):
         coordinates=np.zeros((self.num_of_drones,3))
         for i in range(self.num_of_drones): 
             coordinates[i] = self.agent_positions[self.agent_ids[i]]

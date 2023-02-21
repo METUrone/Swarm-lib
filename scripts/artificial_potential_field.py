@@ -509,3 +509,15 @@ class ArtificialPotentialField():
         array_to_real_positions(positions, height, origin=[width/2, height/2], scale=[real_width / width, real_height / height])
         positions = self.sort_coordinates(positions)
         self.form_coordinates(positions)
+        
+    def land_swarm_inorder(self, error = 0.05):
+        coordinates=np.zeros((self.num_of_drones,3))
+        for i in range(self.num_of_drones): 
+            coordinates[i] = self.agent_positions[self.agent_ids[i]]
+        for j in range(self.num_of_drones):
+            coordinates[j][2] = 0.01
+            self.form_coordinates(coordinates=coordinates) 
+
+    def land_ontop_proof(self):
+        self.form_polygon(1, self.num_of_drones)
+        self.land_swarm_inorder()

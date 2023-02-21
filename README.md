@@ -318,4 +318,30 @@ Forms a star formation by calculating relevant coordinates and using form_coordi
 
 Gives drones coordinates to surround the fire according to the fire coordinates obtained via computer vision.
 
+# Yaml Files
 
+There are 2 yaml files in the config folder with spesifications about variables inside them.
+
+**1-algoritm_parameters.yaml**
+
+Has spesifications about variables used in the artificial potential field algorithm.
+
+| Parameter     |   Explanation |
+| ------------- | ------------- |
+| attractive_constant | attractive constant of the artificial potential field algorithm|
+| repulsive_constant | repulsive constant of the artificial potential field algorithm (must be negative) |
+| repulsive_threshold | repulsive threshold of the artificial potential field algorithm|
+| speed_limit | speed limit |
+|error_radius|distance between goal and agent to determine if it has reached goal |
+|potential_field_timeout| the time after which the potential field algorithm will give a timeout|
+
+**2-crazyflies.yaml**
+
+Has information about drones used in the crazyflie simulation
+
+| Parameter     |   Explanation |
+| ------------- | ------------- |
+| channel | the channel from which the drone receives signal|
+| id | the id of the drone |
+| initialPosition | the initial position of the drone |
+| type | drone type |

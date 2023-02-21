@@ -141,10 +141,6 @@ def array_to_real_positions(coords, max_height, origin=[0,0], scale=[1,1]):
         pos[0] = pos[0] - origin[0] 
         pos[1] = pos[1] - origin[1]
 
-        #center cells
-        pos[0] += 0.5
-        pos[1] += 0.5
-
         #scale
         pos[0] *= scale[0]
         pos[1] *= scale[1]

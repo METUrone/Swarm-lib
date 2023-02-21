@@ -454,7 +454,7 @@ class ArtificialPotentialField():
         print(coordinates)
         self.form_coordinates(coordinates=coordinates)
     
-    def surround_fire(self, field, agent_count):
+    def surround_fire(self, field, agent_count=-1):
         circumference = []
         positions = []
         sorted_positions = []
@@ -462,28 +462,40 @@ class ArtificialPotentialField():
         width = len(field[0])
         height = len(field)
 
-        real_width = 3.5
-        real_height = 3.5
+        real_width = 1.55
+        real_height = 1.80
 
-        for i in range(0, width):
-            for j in range(0, height):
-                if field[j][i]: #only check False items (fire zone)
-                    continue
-                
-                #check neighbours of False items (3x3)
-                for ii in range(i - 1, i + 2):
-                    for jj in range(j - 1, j + 2):
-                        if ii < 0 or ii >= width or jj < 0 or jj >= height:
-                            continue
-                        
-                        if field[jj][ii] and [ii, jj] not in circumference:
-                            circumference.append([ii, jj])
+        z = self.agent_positions[self.agent_ids[0]][2]
+        agent_radius = 0.5 * 0.1 * width / real_width 
+        min_dist = 0.2 * width / real_width
 
-        agent_dist = len(circumference) / agent_count #optimum distance between agents
-        sorted_positions.append(circumference[0])
+        if agent_count == -1:
+            agent_count = self.num_of_drones
+
+        agent_dist = 0
+        while agent_dist < min_dist:
+            for i in range(0, width):
+                for j in range(0, height):
+                    if field[j][i]: #only check False items (fire zone)
+                        continue
+                    
+                    #check neighbours of False items (3x3)
+                    for ii in range(i - 1, i + 2):
+                        for jj in range(j - 1, j + 2):
+                            if ii < 0 or ii >= width or jj < 0 or jj >= height:
+                                continue
+                            
+                            if field[jj][ii] and [ii, jj] not in circumference:
+                                circumference.append([ii, jj, z])
+
+            agent_dist = len(circumference) / agent_count #optimum distance between agents
+
+            for p in circumference:
+                field[p[1]][p[0]] = False
         
-        print("Minimum distance between agents: ", agent_dist, "\n")
+        #print("Optimum distance between agents: ", agent_dist, "\n")
 
+        sorted_positions.append(circumference[0])
         for _ in range(0, len(circumference)-1):
             min_dist = 99999
             cur_pos = sorted_positions[-1]
@@ -498,7 +510,7 @@ class ArtificialPotentialField():
 
             sorted_positions.append(next_pos)
         
-        print("Sorted positions: ", sorted_positions, "\n")
+        #print("Sorted positions: ", sorted_positions, "\n")
         
         positions.append(sorted_positions[0])
         for i in range(1, agent_count):
@@ -511,9 +523,20 @@ class ArtificialPotentialField():
             k1 = 1 - (agent_dist - int(agent_dist));
             k2 = 1 - k1;
 
-            x = min[0]*k1 + max[0]*k2
-            y = min[1]*k1 + max[1]*k2
-            positions.append([x, y]);
+            x = min[0]*k1 + max[0]*k2 + 0.5
+            y = min[1]*k1 + max[1]*k2 + 0.5
+
+            if not field[int(y)][int(x+agent_radius)]: #check right
+                x -= agent_radius
+            elif not field[int(y)][int(x-agent_radius)]: #check left
+                x += agent_radius
+
+            if not field[int(y+agent_radius)][int(x)]: #check up
+                y -= agent_radius
+            elif not field[int(y-agent_radius)][int(x)]: #check down
+                y += agent_radius
+
+            positions.append([x, y, z])
 
         array_to_real_positions(positions, height, origin=[width/2, height/2], scale=[real_width / width, real_height / height])
         positions = self.sort_coordinates(positions)

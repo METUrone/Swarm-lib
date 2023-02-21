@@ -1,0 +1,69 @@
+<launch>
+    
+    <arg name="sim" default=""/> <!--roslaunch swarm crazyswarm.launch sim:="sim" -->
+
+
+    <rosparam command="load" file="$(find swarm)/config/crazyflies.yaml"/>
+    <rosparam command="load" file="$(find swarm)/config/algorithm_params.yaml"/>
+    <rosparam command="load" file="$(find swarm)/config/obstacles.yaml"/>
+
+
+    <node pkg="swarm" type="setup.py" name="setup" output="screen"/>
+
+    <node pkg="swarm" type="crazyswarm_controller.py" name="crazyswarm_controller" output="screen" args="$(arg sim)"/>
+    
+    <node pkg="swarm" type="mission_planner.py" name="mission_planner" output="screen"/>
+
+
+  <rosparam command="load" file="$(find crazyswarm)/launch/crazyflieTypes.yaml" />
+  <rosparam command="load" file="$(find swarm)/config/crazyflies.yaml" />
+
+  <node pkg="crazyswarm" type="crazyswarm_server" name="crazyswarm_server" output="screen" >
+    <rosparam>
+      # Logging configuration (Use enable_logging to actually enable logging)
+      genericLogTopics: ["log1"]
+      genericLogTopicFrequencies: [10]
+      genericLogTopic_log1_Variables: ["stateEstimate.x", "ctrltarget.x"]
+      # firmware parameters for all drones (use crazyflieTypes.yaml to set per type, or
+      # allCrazyflies.yaml to set per drone)
+      firmwareParams:
+        commander:
+          enHighLevel: 1
+        stabilizer:
+          estimator: 2 # 1: complementary, 2: kalman
+          controller: 1 # 1: PID, 2: mellinger
+        ring:
+          effect: 16 # 6: double spinner, 7: solid color, 16: packetRate
+          solidBlue: 255 # if set to solid color
+          solidGreen: 0 # if set to solid color
+          solidRed: 0 # if set to solid color
+          headlightEnable: 0
+        locSrv:
+          extPosStdDev: 1e-3
+          extQuatStdDev: 0.5e-1
+        kalman:
+          resetEstimation: 1
+      # tracking
+      motion_capture_type: none # one of none,vicon,optitrack,optitrack_closed_source,qualisys,vrpn
+      object_tracking_type: "libobjecttracker" # one of motionCapture,libobjecttracker
+      send_position_only: False # set to False to send position+orientation; set to True to send position only
+      motion_capture_host_name: "vicon"
+      # motion_capture_interface_ip: "" # optional for optitrack with multiple interfaces
+      save_point_clouds: "/dev/null" # set to a valid path to log mocap point cloud binary file.
+      print_latency: False
+      write_csvs: False
+      force_no_cache: False
+      enable_parameters: True
+      enable_logging: True
+      enable_logging_pose: True
+    </rosparam>
+  </node>
+
+  <node pkg="crazyswarm" type="crazyswarm_teleop" name="crazyswarm_teleop" output="screen">
+    <param name="csv_file" value="$(find crazyswarm)/launch/figure8_smooth.csv" />
+    <param name="timescale" value="0.8" />
+  </node>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find crazyswarm)/launch/test.rviz"/>
+
+</launch>

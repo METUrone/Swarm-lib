@@ -42,17 +42,19 @@ def vel_callback_handler(id):
 for param in swarm_params:
     pose = PoseStamped()
 
-    uris.append('radio://0/{}/2M/E7E7E7E7{}'.format(param["channel"], param["id"]))
+    id = str(param["id"]) if param["id"] > 9 else "0" + str(param["id"])
+
+    uris.append('radio://0/{}/2M/E7E7E7E7{}'.format(param["channel"], id))
     pose.pose.position.x = param["initialPosition"][0]
     pose.pose.position.y = param["initialPosition"][1]
     pose.pose.position.z = param["initialPosition"][2]
 
-    positions[param["id"]] = pose
-    ids.append(param["id"])
-    pose_publishers[param["id"]] = rospy.Publisher("/{}/pose".format(param["id"]), PoseStamped, queue_size=1)
+    positions[id] = pose
+    ids.append(id)
+    pose_publishers[id] = rospy.Publisher("/{}/pose".format(id), PoseStamped, queue_size=1)
 
-    vel_commands[param["id"]] = Twist()
-    rospy.Subscriber("/{}/vel_commander".format(param["id"]), Twist, vel_callback_handler(param["id"]))
+    vel_commands[id] = Twist()
+    rospy.Subscriber("/{}/vel_commander".format(id), Twist, vel_callback_handler(id))
 
 
 
@@ -83,17 +85,19 @@ def cf_loop(uri):
     
     cf_id = uri[-2:]
 
+    print("Taking off ...")
     duration = 2.0
     takeoff_rate = 10.0
     for i in range(int(duration *  takeoff_rate)):
-        swarm._cfs[uri].cf.commander.send_hover_setpoint(0, 0, 0, 0.2) # takeoff
+
+        swarm._cfs[uri].cf.commander.send_hover_setpoint(0.0, 0.0, 0.0, 0.2) # takeoff
         time.sleep(1.0 / takeoff_rate)
 
 
-    for _ in range(5 * 10):
+    # for _ in range(5 * 10):
 
-        swarm._cfs[uri].cf.commander.send_velocity_world_setpoint(vel_commands[cf_id].linear.x, vel_commands[cf_id].linear.y, vel_commands[cf_id].linear.z, 0)
-        time.sleep(0.1)
+    #     # swarm._cfs[uri].cf.commander.send_velocity_world_setpoint(vel_commands[cf_id].linear.x, vel_commands[cf_id].linear.y, vel_commands[cf_id].linear.z, 0)
+    #     time.sleep(0.1)
 
 
 
@@ -168,3 +172,10 @@ if __name__ == '__main__':
 
 
         sys.exit(-1)
+
+
+    # with SyncCrazyflie(URI, cf=Crazyflie(rw_cache='./cache')) as scf:
+
+    #     scf.cf.param.add_update_callback(group='deck', name='bcFlow2',
+    #                                      cb=param_deck_flow)
+    #     time.sleep(1)

@@ -351,6 +351,7 @@ class ArtificialPotentialField():
                 print(vector[i][2])
 
         self.form_coordinates(coordinates)     
+        print("Target reached")
 
     def rotate(self, degree, step= 10, duration = 3):
         
@@ -432,6 +433,7 @@ class ArtificialPotentialField():
         coordinates=self.sort_coordinates(coordinates=coordinates)
         print(coordinates)
         self.form_coordinates(coordinates=coordinates)
+        
     def form_star(self,radius,h=0.5,displacement=np.zeros(3)):
         deg_36=math.pi/5
         deg_54=3*math.pi/10

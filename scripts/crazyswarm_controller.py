@@ -11,7 +11,7 @@ from geometry_msgs.msg import PoseStamped, Twist
 from threading import Thread
 import numpy as np
 
-rospy.init_node("crazyswarm_controller")
+# rospy.init_node("crazyswarm_controller")
 
 swarm_params = rospy.get_param("/crazyflies")
 print(rospy.get_param("/crazyflies")[0]["id"])
@@ -28,8 +28,8 @@ pose_publishers = {}
 vel_commands = {}
 
 for agent in agent_list:
-    agent.takeoff(targetHeight=1, duration=1)
-timeHelper.sleep(1)
+    agent.takeoff(targetHeight=0.8, duration=1)
+timeHelper.sleep(4)
 
 
 def vel_commander_callback(data : Twist, agent_id):

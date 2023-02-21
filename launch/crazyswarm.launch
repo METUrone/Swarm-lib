@@ -1,6 +1,6 @@
 <launch>
     
-    <arg name="sim" default="--sim"/> <!--roslaunch swarm crazyswarm.launch sim:="sim" -->
+    <arg name="sim" default=""/> <!--roslaunch swarm crazyswarm.launch sim:="sim" -->
 
 
     <rosparam command="load" file="$(find swarm)/config/crazyflies.yaml"/>
@@ -10,7 +10,7 @@
 
     <node pkg="swarm" type="setup.py" name="setup" output="screen"/>
 
-    <!-- node pkg="swarm" type="crazyswarm_controller.py" name="crazyswarm_controller" output="screen" args="$(arg sim)"/ -->
+    <node pkg="swarm" type="crazyswarm_controller.py" name="crazyswarm_controller" output="screen" args="$(arg sim)"/>
     
     <node pkg="swarm" type="mission_planner.py" name="mission_planner" output="screen"/>
 

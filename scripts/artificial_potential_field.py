@@ -428,6 +428,8 @@ class ArtificialPotentialField():
             coordinates[i]=coordinates[i]-center_displacement_vector
         if direction:
             coordinates=rotate_coordinates(coordinates=coordinates,angle=direction)
+        for i in range(num_of_agents):
+            coordinates[i]=coordinates[i]+center_displacement_vector
         coordinates=self.sort_coordinates(coordinates=coordinates)
         print(coordinates)
         self.form_coordinates(coordinates=coordinates)

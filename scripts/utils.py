@@ -106,7 +106,8 @@ def rotate_coordinates_wrt_to(coordinates,angle,point=np.zeros(2)):
     for coordinate in coordinates:
         coordinates_respect_to_point.append([coordinate[0]- point[0], coordinate[1]- point[1]])
     for i in range(len(coordinates_respect_to_point)):
-        result.append([np.dot(rot, coordinates_respect_to_point[i])+np.array([point[0],point[1],coordinates[i][2]])])
+        tmp_point=(np.dot(rot, coordinates_respect_to_point[i])+point)
+        result.append([tmp_point[0],tmp_point[1],coordinates[i][2]])
     return np.array(result)
 
 

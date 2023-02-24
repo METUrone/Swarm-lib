@@ -397,40 +397,37 @@ class ArtificialPotentialField():
             num_of_agents=self.num_of_drones
         angle=degree_to_radian(angle)
         coordinates=np.zeros((num_of_agents,3))
-        center_displacement_vector=np.zeros(3)
-        coordinates[0]=np.array([displacement[0],displacement[1],h+displacement[2]])
+        coordinates[0]=np.array([0,0,h])
         angle_to_used=angle/2
         second_wing_modifier=num_of_agents//2+1
         if not (num_of_agents%2):#if it is certain that for V form num o agents will be odd, then this whole if block can be omitted
             x=(-(num_of_agents/2)*math.sin(angle_to_used)*radius)
             y=(-(num_of_agents/2)*math.cos(angle_to_used)*radius)
-            z=h+displacement[2]
-            coordinates[num_of_agents-1][0]=x+displacement[0]
-            coordinates[num_of_agents-1][1]=y+displacement[1]
+            z=h
+            coordinates[num_of_agents-1][0]=x
+            coordinates[num_of_agents-1][1]=y
             coordinates[num_of_agents-1][2]=z
             second_wing_modifier-=1
-            center_displacement_vector=np.array([x,y,z])
         for i in range((num_of_agents-1)//2):
             x=(-(i+1)*math.sin(angle_to_used)*radius)
             y=(-(i+1)*math.cos(angle_to_used)*radius)
-            z=h+displacement[2]
-            coordinates[i+1][0]=x+displacement[0]
-            coordinates[i+1][1]=y+displacement[1]
+            z=h
+            coordinates[i+1][0]=x
+            coordinates[i+1][1]=y
             coordinates[i+1][2]=z
-            coordinates[i+second_wing_modifier][0]=-x+displacement[0]
-            coordinates[i+second_wing_modifier][1]=y+displacement[1]
+            coordinates[i+second_wing_modifier][0]=-x
+            coordinates[i+second_wing_modifier][1]=y
             coordinates[i+second_wing_modifier][2]=z
-            center_displacement_vector[1]+=2*y
-            center_displacement_vector[2]+=2*z
-        center_displacement_vector[0]/=num_of_agents
-        center_displacement_vector[1]/=num_of_agents
-        center_displacement_vector[2]/=num_of_agents
+        center_of_mass=(coordinates[0]+coordinates[num_of_agents-1]+coordinates[(num_of_agents-1)//2])/3
+        center_of_mass[2]=0
+        print(center_of_mass)
         for i in range(num_of_agents):
-            coordinates[i]=coordinates[i]-center_displacement_vector
+            coordinates[i]=coordinates[i]-center_of_mass
         if direction:
-            coordinates=rotate_coordinates(coordinates=coordinates,angle=direction)
+            coordinates=rotate_coordinates_wrt_to(coordinates=coordinates,angle=direction)
+            print(coordinates)
         for i in range(num_of_agents):
-            coordinates[i]=coordinates[i]+center_displacement_vector
+            coordinates[i]=coordinates[i]+displacement
         coordinates=self.sort_coordinates(coordinates=coordinates)
         print(coordinates)
         self.form_coordinates(coordinates=coordinates)

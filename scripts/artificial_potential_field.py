@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import rospy
 import time
 import numpy as np
@@ -23,7 +21,6 @@ class ArtificialPotentialField():
         self.get_agent_ids() # It is also possible to explicitly give id list without using this method
         self.vel_publishers = {}
         self.vel_commands = {}
-        self.obstacles = {}
         self.repulsive_pts = {}
         self.rate = rospy.Rate(100) # 10 Hz
         self.stop_velocity = Twist()
@@ -36,6 +33,14 @@ class ArtificialPotentialField():
         self.speed_limit = rospy.get_param("/artificial_potential_field/speed_limit")
         self.repulsive_threshold = rospy.get_param("/artificial_potential_field/repulsive_threshold")
         self.potential_field_timeout = rospy.get_param("/artificial_potential_field/potential_field_timeout")
+
+        # Get obstacles from params
+        self.obstacles = rospy.get_param("/obstacles")
+        self.obstacle_radius = rospy.get_param("/radius")
+        
+
+        for agent in self.agents:
+            self.agent_positions[agent["id"]] = agent["initialPosition"]
 
         for id in self.agent_ids:
             vel_command = Twist()
@@ -217,18 +222,13 @@ class ArtificialPotentialField():
                 z_distance = self.agent_positions[id][2] - self.obstacles[i][2]
                 y_distance = self.agent_positions[id][1] - self.obstacles[i][1]
                 x_distance = self.agent_positions[id][0] - self.obstacles[i][0]
-
-                z_distance = (z_distance - self.obstacles[i]) if (z_distance > 0 )else (z_distance + self.obstacles[i])
-                y_distance = (y_distance - self.obstacles[i]) if (y_distance > 0 )else (y_distance + self.obstacles[i])
-                x_distance = (x_distance - self.obstacles[i]) if (x_distance > 0 )else (x_distance + self.obstacles[i]) 
-
             
                 if z_distance != 0 and abs(z_distance) < self.repulsive_threshold:
-                    repulsive_force_z += (1/(z_distance**2))*(1/self.repulsive_threshold - 1/abs(z_distance))*self.repulsive_constant * (-(z_distance) / abs(z_distance))
+                    repulsive_force_z += (1/(z_distance**2))*(1/self.repulsive_threshold - 1/abs(z_distance))*(self.repulsive_constant) * (-(z_distance) / abs(z_distance))
                 if y_distance != 0 and abs(y_distance) < self.repulsive_threshold:
-                    repulsive_force_y += (1/(y_distance**2))*(1/self.repulsive_threshold - 1/abs(y_distance))*self.repulsive_constant * (-(y_distance) / abs(y_distance))
+                    repulsive_force_y += (1/(y_distance**2))*(1/self.repulsive_threshold - 1/abs(y_distance))*(self.repulsive_constant) * (-(y_distance) / abs(y_distance))
                 if x_distance != 0 and abs(x_distance) < self.repulsive_threshold:
-                    repulsive_force_x += (1/(x_distance**2))*(1/self.repulsive_threshold - 1/abs(x_distance))*self.repulsive_constant * (-(x_distance) / abs(x_distance))
+                    repulsive_force_x += (1/(x_distance**2))*(1/self.repulsive_threshold - 1/abs(x_distance))*(self.repulsive_constant) * (-(x_distance) / abs(x_distance))
 
         for key in self.repulsive_pts:
             z_distance = self.agent_positions[id][2] - self.repulsive_pts[key][2]
@@ -388,6 +388,7 @@ class ArtificialPotentialField():
             
             print(coordinates)
             self.form_coordinates(coordinates=coordinates)
+            
     def form_v(self,radius,h=0.5,angle=60,displacement=np.zeros(3),direction=0,num_of_agents=-1):
         #radius is distance between two closest agent
         #angle is the angle between two wings of V
@@ -455,7 +456,7 @@ class ArtificialPotentialField():
         print(coordinates)
         self.form_coordinates(coordinates=coordinates)
     
-    def surround_fire(self, field, agent_count):
+    def surround_fire(self, field, agent_count=-1):
         circumference = []
         positions = []
         sorted_positions = []
@@ -463,28 +464,40 @@ class ArtificialPotentialField():
         width = len(field[0])
         height = len(field)
 
-        real_width = 3.5
-        real_height = 3.5
+        real_width = 1.55
+        real_height = 1.80
 
-        for i in range(0, width):
-            for j in range(0, height):
-                if field[j][i]: #only check False items (fire zone)
-                    continue
-                
-                #check neighbours of False items (3x3)
-                for ii in range(i - 1, i + 2):
-                    for jj in range(j - 1, j + 2):
-                        if ii < 0 or ii >= width or jj < 0 or jj >= height:
-                            continue
-                        
-                        if field[jj][ii] and [ii, jj] not in circumference:
-                            circumference.append([ii, jj])
+        z = self.agent_positions[self.agent_ids[0]][2]
+        agent_radius = 0.5 * 0.1 * width / real_width 
+        min_dist = 0.2 * width / real_width
 
-        agent_dist = len(circumference) / agent_count #optimum distance between agents
-        sorted_positions.append(circumference[0])
+        if agent_count == -1:
+            agent_count = self.num_of_drones
+
+        agent_dist = 0
+        while agent_dist < min_dist:
+            for i in range(0, width):
+                for j in range(0, height):
+                    if field[j][i]: #only check False items (fire zone)
+                        continue
+                    
+                    #check neighbours of False items (3x3)
+                    for ii in range(i - 1, i + 2):
+                        for jj in range(j - 1, j + 2):
+                            if ii < 0 or ii >= width or jj < 0 or jj >= height:
+                                continue
+                            
+                            if field[jj][ii] and [ii, jj] not in circumference:
+                                circumference.append([ii, jj, z])
+
+            agent_dist = len(circumference) / agent_count #optimum distance between agents
+
+            for p in circumference:
+                field[p[1]][p[0]] = False
         
-        print("Minimum distance between agents: ", agent_dist, "\n")
+        #print("Optimum distance between agents: ", agent_dist, "\n")
 
+        sorted_positions.append(circumference[0])
         for _ in range(0, len(circumference)-1):
             min_dist = 99999
             cur_pos = sorted_positions[-1]
@@ -499,7 +512,7 @@ class ArtificialPotentialField():
 
             sorted_positions.append(next_pos)
         
-        print("Sorted positions: ", sorted_positions, "\n")
+        #print("Sorted positions: ", sorted_positions, "\n")
         
         positions.append(sorted_positions[0])
         for i in range(1, agent_count):
@@ -512,9 +525,20 @@ class ArtificialPotentialField():
             k1 = 1 - (agent_dist - int(agent_dist));
             k2 = 1 - k1;
 
-            x = min[0]*k1 + max[0]*k2
-            y = min[1]*k1 + max[1]*k2
-            positions.append([x, y]);
+            x = min[0]*k1 + max[0]*k2 + 0.5
+            y = min[1]*k1 + max[1]*k2 + 0.5
+
+            if not field[int(y)][int(x+agent_radius)]: #check right
+                x -= agent_radius
+            elif not field[int(y)][int(x-agent_radius)]: #check left
+                x += agent_radius
+
+            if not field[int(y+agent_radius)][int(x)]: #check up
+                y -= agent_radius
+            elif not field[int(y-agent_radius)][int(x)]: #check down
+                y += agent_radius
+
+            positions.append([x, y, z])
 
         array_to_real_positions(positions, height, origin=[width/2, height/2], scale=[real_width / width, real_height / height])
         positions = self.sort_coordinates(positions)

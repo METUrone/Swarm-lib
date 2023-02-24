@@ -16,9 +16,9 @@ if __name__ == '__main__':
     clock = Clock()
     
     # Publish frequency
-    clock_rate = rospy.get_param('~clock_frequency')
+    clock_rate = rospy.get_param('/clock_frequency')
     # Sets the value of the published time
-    real_time_factor = rospy.get_param('~real_time_factor')
+    real_time_factor = rospy.get_param('/real_time_factor')
 
     clock.clock = rospy.Time.from_sec(1.0 / clock_rate)
     

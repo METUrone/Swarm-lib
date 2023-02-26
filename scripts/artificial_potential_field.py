@@ -518,6 +518,12 @@ class ArtificialPotentialField():
             coordinates[j][2] = 0.01
             self.form_coordinates(coordinates=coordinates) 
 
-    def land_ontop_proof(self):
-        self.form_polygon(1, self.num_of_drones)
+    def land_prism_inorder(self, distance_between = 1, height = 0.5):
+        coordinates_up = formation_coordinates(distance_between, self.num_of_drones//2, height=distance_between + height)
+        angle = 360/(self.num_of_drones)
+        coordinates_up_rotated = rotate_coordinates(coordinates_up, angle)
+        coordinates_down = formation_coordinates(distance_between, self.num_of_drones//2, height)
+        coordinates = self.sort_coordinates(np.concatenate((coordinates_up_rotated, coordinates_down)))
+
+        self.form_coordinates(coordinates)
         self.land_swarm_inorder()

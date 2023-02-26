@@ -123,10 +123,10 @@ roslaunch swarm gazebo.launch
 # Basic Structure
 This package consists of two main parts artificial_potential_field.py and iris_controller.py. artificial_potential_field nodes subscribes to current poses of uav{uav_id}/mavros/local_position/pose topic whose publisher is mavros, and publishes the instant velocity for each agent via {uav_id}/vel_commander topic. Then iris_controller node takes these velocity commands, send them to PX4 controller via /uav0/mavros/setpoint_velocity/cmd_vel_unstamped topic and publishes resulting poses to {uad_id}/position topic whose subscriber is artificial_potential_field node. This cycle continues until all tasks are achieved.
 
-The following graph is a description of such a system with two agents. For the systems with more agents, description consists of the repetition of this structure.
+The following graph is a description of such a system with six agents. For the systems with more agents, description consists of the repetition of this structure.
 
 
-![rosgraph](https://user-images.githubusercontent.com/85796946/188333321-a25cf9a9-79fa-4273-9a87-2b285b6a855b.png)
+![rosgraph](https://user-images.githubusercontent.com/13626827/221397467-b97d6242-b83f-4abe-a29f-639e4111fc37.png)
 
 Iris_takeoff nodes are responsible for keeping drones in flight, and the mission_planner node is an interface where we specify the tasks we want to achieve (A GUI will be placed soon). Since crazyflie ids start from 193, here /uavx/ corresponds to the image of the crazyflie with id x in the simulation.
 

@@ -21,7 +21,7 @@ customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "gre
 
 class App(customtkinter.CTk):
 
-    with open("mission_planner.py","r+") as fp:
+    with open(os.path.dirname(__file__) +"/../mission_planner.py","r+") as fp:
         lines = fp.readlines()# read an store all lines into list
         fp.seek(0)# move file pointer to the beginning of a file
         fp.truncate()# truncate the file
@@ -45,7 +45,7 @@ class App(customtkinter.CTk):
             rad=float(self.radius_entry.get())
             h=float(self.height_entry.get())
             obj_h=float(self.top_entry.get()) 
-            with open("mission_planner.py", "a") as f:     # write missions one by one (order can be changed later)
+            with open(os.path.dirname(__file__) +"/../mission_planner.py", "a") as f:     # write missions one by one (order can be changed later)
                         f.write(f"\napf.form_3d({rad}, {num},{h},{obj_h})" )
                         f.write(f"\ntime.sleep({self.delay1_entry.get()})")
                         f.write(f"\napf.go({(self.go_entry.get())})" )
@@ -54,7 +54,8 @@ class App(customtkinter.CTk):
         def Run():
             Add_mission()
             import os
-            os.system("./3d_gui.sh")  #import this sh file to os.system to maintain alternative option about runing our code in terminal
+            print(os.path.dirname(__file__))
+            os.system(os.path.dirname(__file__) +"/3d_gui.sh")  #import this sh file to os.system to maintain alternative option about runing our code in terminal
         
         def Add_fly(in_num,out_num,id=195,x=1.0,y=1.0,z=0.0): #append new flies (!!!set crazyflies.yaml file to be have only 3 flies and last one's id must be 195!!!)
             print(in_num,out_num)
@@ -63,7 +64,7 @@ class App(customtkinter.CTk):
                 x=x+1 if x!=1 else (-1)
                 if in_num%3==0: #should be fixed!!
                     y+=1
-                with open(os.path.dirname(__file__) +"/../config/crazyflies.yaml", "a") as f:  ###  Adding new flies.. !! DON NOT TOUCH/CHANGE ANYTHING ! ! !
+                with open(os.path.dirname(__file__) +"/../../config/crazyflies.yaml", "a") as f:  ###  Adding new flies.. !! DON NOT TOUCH/CHANGE ANYTHING ! ! !
                     f.write(f"""\n- channel: 125
   id: {id}
   initialPosition:      
@@ -74,7 +75,7 @@ class App(customtkinter.CTk):
                 in_num-=1  
 
         def Num_3D():
-            with open(os.path.dirname(__file__) +"/../config/crazyflies.yaml","r+") as yaml:
+            with open(os.path.dirname(__file__) +"/../../config/crazyflies.yaml","r+") as yaml:
                 lines = yaml.readlines()# read an store all lines into list
                 yaml.seek(0)# move file pointer to the beginning of a file
                 yaml.truncate()# truncate the file

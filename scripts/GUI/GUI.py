@@ -21,6 +21,8 @@ customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "gre
 
 class App(customtkinter.CTk):
 
+    
+
     with open(os.path.dirname(__file__) +"/../mission_planner.py","r+") as fp:
         lines = fp.readlines()# read an store all lines into list
         fp.seek(0)# move file pointer to the beginning of a file
@@ -31,8 +33,10 @@ class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
 
+        # VARs
+        obstacles=[]
+
         #FUNCTIONS --> Swarm
-    
         def Add_mission():
                 
             if self.type_shape=="prism":
@@ -97,9 +101,58 @@ class App(customtkinter.CTk):
             elif self.type_shape=="cylinder":
                 Add_fly(int(self.edge_entry.get())*2+2,3)
             
+        def Run_Yangin():
+            Add_mission()
+            import os
+            print(os.path.dirname(__file__))
+            os.system(os.path.dirname(__file__) +"/3d_gui.sh") 
 
-                    
-    
+
+        #Functions for Misson Engel
+
+        def Run_Engel():
+            Add_mission()
+            import os
+            print(os.path.dirname(__file__))
+            os.system(os.path.dirname(__file__) +"/Engel_gui.sh") 
+        
+        def add_obstacle():
+            x=int(self.x_entry.get())
+            y=int(self.y_entry.get())
+            r=int(self.z_entry.get())
+            new_obs=[x,y,r]
+            obstacles.append(new_obs)
+            for i in range(len(obstacles)):
+                print((i+1),"-->",obstacles[i])
+            print("*"*100)
+
+        def del_obstacle():
+            i=int(self.delobs_entry.get())
+            obstacles.pop(i-1)
+            for i in range(len(obstacles)):
+                print((i+1),"-->",obstacles[i])
+            print("*"*100)
+
+        def set_obstacle():
+            with open(os.path.dirname(__file__) +"/../../config/obstacles.yaml","r+") as yaml:
+                lines = yaml.readlines()# read an store all lines into list
+                yaml.seek(0)# move file pointer to the beginning of a file
+                yaml.truncate()# truncate the file
+                yaml.writelines(lines[:0])#start writing first 3 lines 
+
+            radius=int(self.radius_engel_entry.get())
+            height=int(self.height_engel_entry.get())
+            with open(os.path.dirname(__file__) +"/../../config/obstacles.yaml", "a") as f:  ###  Adding new flies.. 
+                    f.write(f"""radius: {radius}\n""".format(radius))
+                    f.write(f"""height: {height}\n""".format(height))
+                    f.write(f"\nobstacles: [")
+            for i in range(len(obstacles)):
+                lst=obstacles[i]
+                with open(os.path.dirname(__file__) +"/../../config/obstacles.yaml", "a") as f:  ###  Adding new flies.. 
+                    f.write(f"""\n  {lst},""".format(lst))
+            with open(os.path.dirname(__file__) +"/../../config/obstacles.yaml", "a") as f:  ###  Adding new flies.. 
+                f.write(f"""\n ]""")
+
         # configure window
         self.title("MetuRone Swarm")
         self.geometry(f"{800}x{580}")
@@ -176,6 +229,11 @@ class App(customtkinter.CTk):
         self.delay2_entry = customtkinter.CTkEntry(self.tabview.tab("3B"), width=250, height=50,
                                                    placeholder_text="Second Delay",)
         self.delay2_entry.grid(row=i, column=y, padx=(5, 5), pady=(5, 0), sticky="nsew")
+        i+=1
+
+        self.run_button_3B = customtkinter.CTkButton(self.tabview.tab("3B"),width=250,height=50, text="Run", font=customtkinter.CTkFont(size=20, weight="bold"),command=Run)
+        self.run_button_3B.grid(row=i, column=y, padx=(5, 5), pady=(5, 0))
+
         
 
         #coloumn2 of the first tab
@@ -197,19 +255,72 @@ class App(customtkinter.CTk):
 
 
         #2nd TAB
-        self.label_tab_2 = customtkinter.CTkLabel(self.tabview.tab("Yangin"), text="Yakinda yüklenecek")
+        self.label_tab_2 = customtkinter.CTkLabel(self.tabview.tab("Yangin"), text="")
         self.label_tab_2.grid(row=0, column=0, padx=20, pady=20)
 
         self.add_Button = customtkinter.CTkButton(self.tabview.tab("Yangin"),text="Open WebCam", width=250, height=50,font=customtkinter.CTkFont(size=17),command=self.openNewWindow)
         self.add_Button.grid(row=1, column=0 ,padx=0, pady=0)
 
+        self.run_button_Yangin = customtkinter.CTkButton(self.tabview.tab("Yangin"),width=250,height=50, text="Run", font=customtkinter.CTkFont(size=20, weight="bold"),command=Run_Yangin)
+        self.run_button_Yangin.grid(row=2, column=0, padx=20, pady=20)
 
 
-        # Run Button
-        self.run_button_3B = customtkinter.CTkButton(self,width=500,height=100, text="Run", font=customtkinter.CTkFont(size=20, weight="bold"),command=Run)
-        self.run_button_3B.grid(row=1, column=1 ,padx=5, pady=20)
 
+        # 3rd TAB
+        i31,i32=0,0
+        self.radius_engel_entry = customtkinter.CTkEntry(self.tabview.tab("Engel"),width=250, height=50,
+                                                   placeholder_text="Radius",)
+        self.radius_engel_entry.grid(row=i31, column=0, padx=(10, 10), pady=(30, 5), sticky="nsew")
+        i31+=1
+         
+        self.height_engel_entry = customtkinter.CTkEntry(self.tabview.tab("Engel"),width=250, height=50,
+                                                   placeholder_text="Height",)
+        self.height_engel_entry.grid(row=i31, column=0, padx=(10, 10), pady=(5, 5), sticky="nsew")
+        i31+=1
+         
+        self.x_entry = customtkinter.CTkEntry(self.tabview.tab("Engel"),width=250, height=50,
+                                                   placeholder_text="X coordinate",)
+        self.x_entry.grid(row=i31, column=0, padx=(10, 10), pady=(5, 5), sticky="nsew")
+        i31+=1
+             
+        self.y_entry = customtkinter.CTkEntry(self.tabview.tab("Engel"), width=250, height=50,
+                                                placeholder_text="Y coordinate",)
+        self.y_entry.grid(row=i31, column=0, padx=(10, 10), pady=(5, 5), sticky="nsew")
+        i31+=1
+             
+        self.z_entry = customtkinter.CTkEntry(self.tabview.tab("Engel"), width=250, height=50,
+                                                   placeholder_text="Z coordinate",)
+        self.z_entry.grid(row=i31, column=0, padx=(10, 10), pady=(5, 5), sticky="nsew")
+        i31+=1
 
+        self.delobs_entry = customtkinter.CTkEntry(self.tabview.tab("Engel"), width=250, height=50,
+                                                   placeholder_text="Deleted Item",)
+        self.delobs_entry.grid(row=i31, column=0, padx=(10, 10), pady=(5, 5), sticky="nsew")
+        i31+=1
+
+        self.label_tab_3 = customtkinter.CTkLabel(self.tabview.tab("Engel"), text="")
+        self.label_tab_3.grid(row=i32, column=1, padx=(10, 10), pady=(30, 5))
+        i32+=1
+
+        self.label_tab_4 = customtkinter.CTkLabel(self.tabview.tab("Engel"), text="")
+        self.label_tab_4.grid(row=i32, column=1, padx=(10, 10), pady=(5, 5))
+        i32+=1
+
+        self.add_button_Engel = customtkinter.CTkButton(self.tabview.tab("Engel"),width=250,height=50, text="Add Obstacle", font=customtkinter.CTkFont(size=20, weight="bold"),command=add_obstacle)
+        self.add_button_Engel.grid(row=i32, column=1, padx=0, pady=0)
+        i32+=1
+
+        self.run_button_Engel = customtkinter.CTkButton(self.tabview.tab("Engel"),width=250,height=50, text="Set Obstacle", font=customtkinter.CTkFont(size=20, weight="bold"),command=set_obstacle)
+        self.run_button_Engel.grid(row=i32, column=1, padx=0, pady=0)
+        i32+=1
+
+        self.remove_obstacle = customtkinter.CTkButton(self.tabview.tab("Engel"),width=250,height=50, text="Remove Obstacle", font=customtkinter.CTkFont(size=20, weight="bold"),command=del_obstacle)
+        self.remove_obstacle.grid(row=i32, column=1, padx=0, pady=0)
+        i32+=1
+
+        self.run_button_Engel = customtkinter.CTkButton(self.tabview.tab("Engel"),width=250,height=50, text="Run", font=customtkinter.CTkFont(size=20, weight="bold"),command=Run_Engel)
+        self.run_button_Engel.grid(row=i32, column=1, padx=0, pady=0)
+        i32+=1
 
         #left part
         self.sidebar_button_3.configure(state="disabled", text="Disabled CTkButton")

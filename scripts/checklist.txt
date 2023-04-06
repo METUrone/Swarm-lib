@@ -1,0 +1,10 @@
+pozisyon tespit fişe takılı mı
+
+crazyswarm controller da init node yorumsuz olmalı
+
+birden fazla chanel tipi varsa birden falza dongle olmalı
+
+dronelar x e bakmalı
+
+batarya
+

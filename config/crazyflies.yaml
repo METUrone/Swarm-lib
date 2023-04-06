@@ -1,0 +1,59 @@
+# initial position does not have to be correct if you are not flying with flowdeck or crazyswarm
+
+
+crazyflies:
+- channel: 105
+  id: 199
+  initialPosition:
+  - 0.0
+  - 0.0
+  - 0.0
+  type: default
+  
+# - channel: 105
+#   id: 200
+#   initialPosition:
+#   - -0.5
+#   - 0.0
+#   - 0.0
+#   type: default
+
+# - channel: 105
+#   id: 201
+#   initialPosition:
+#   - 0.5
+#   - 0.5
+#   - 0.0
+#   type: default
+
+- channel: 95
+  id: 209
+  initialPosition:
+  - 0.5
+  - 0.0
+  - 0.0
+  type: default
+
+- channel: 95
+  id: 210
+  initialPosition:
+  - -0.5
+  - 0.0
+  - 0.0
+  type: default
+
+# - channel: 95
+#   id: 211
+#   initialPosition:
+#   - 0.0
+#   - 0.0
+#   - 0.0
+#   type: default
+
+# - channel: 105
+#   id: 199
+#   initialPosition:
+#   - 0.5
+#   - -0.5
+#   - 0.0
+#   type: default

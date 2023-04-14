@@ -11,6 +11,8 @@ from geometry_msgs.msg import PoseStamped, Twist
 from threading import Thread
 import numpy as np
 
+from swarm.srv import Land, LandResponse
+
 if sys.argv[1] == "--sim":
     rospy.init_node("crazyswarm_controller")
 
@@ -19,7 +21,7 @@ print(rospy.get_param("/crazyflies")[0]["id"])
 
 num_of_drones = len(swarm_params)
 sleep_duration = 0.01
-
+landing = {}
 
 crazyswarm = Crazyswarm("{}/../config/crazyflies.yaml".format(__file__.strip("crazyswarm_controller.py")))
 agent_list = crazyswarm.allcfs.crazyflies
@@ -28,12 +30,21 @@ agents_by_id = crazyswarm.allcfs.crazyfliesById
 pose_publishers = {}
 vel_commands = {}
 
+for id in agents_by_id:
+    landing[id] = False
+
 for agent in agent_list:
     agent.takeoff(targetHeight=0.8, duration=1)
-timeHelper.sleep(4)
+timeHelper.sleep(3)
 
+def land_callback(req):
+    for e in landing:
+        landing[e] = True
 
-def vel_commander_callback(data : Twist, agent_id):
+    agents_by_id[req.id].land(0.05, 5)
+    return LandResponse(False)
+
+def vel_commander_callback(data: Twist, agent_id):
     global vel_commands
     vel_commands[agent_id] = np.array([data.linear.x, data.linear.y, data.linear.z])
 
@@ -64,17 +75,20 @@ def publish_positions(agents_by_id):
 
 def send_vel_commands(agents_by_id):
 
-    global sleep_duration 
+    global sleep_duration, landing
 
     while not rospy.is_shutdown():
         for agent_id in agents_by_id.keys():
-            agents_by_id[agent_id].cmdVelocityWorld(vel_commands[agent_id], 0.0)
+            if not landing[agent_id]:
+                agents_by_id[agent_id].cmdVelocityWorld(vel_commands[agent_id], 0.0)
 
         rospy.sleep(sleep_duration)
 
 Thread(target=rospy.spin).start()
 Thread(target=publish_positions, args=(agents_by_id,)).start()
 Thread(target=send_vel_commands, args=(agents_by_id,)).start()
+
+land_srv = rospy.Service("land", Land, land_callback)
 
 while not rospy.is_shutdown():
     timeHelper.sleep(sleep_duration)

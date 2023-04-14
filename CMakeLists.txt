@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -59,6 +60,7 @@ add_service_files(
   FILES
   PoseCommand.srv
   FireData.srv
+  Land.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -72,6 +74,7 @@ add_service_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 ################################################
@@ -133,8 +136,9 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/swarm_node.cpp)
+add_executable(apf src/apf.cpp)
 
+add_library(agent src/agent.cpp)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -146,9 +150,10 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(apf
+   ${catkin_LIBRARIES}
+   agent
+)
 
 #############
 ## Install ##

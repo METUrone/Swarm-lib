@@ -2,7 +2,7 @@
     
     <arg name="sim" default=""/> <!--roslaunch swarm crazyswarm.launch sim:="sim" -->
 
-
+    <rosparam command="load" file="$(find swarm)/config/crazyflieTypes.yaml"/>
     <rosparam command="load" file="$(find swarm)/config/crazyflies.yaml"/>
     <rosparam command="load" file="$(find swarm)/config/algorithm_params.yaml"/>
     <rosparam command="load" file="$(find swarm)/config/obstacles.yaml"/>
@@ -13,7 +13,7 @@
     <node pkg="swarm" type="crazyswarm_controller.py" name="crazyswarm_controller" output="screen" args="$(arg sim)"/>
     
     <node pkg="swarm" type="mission_planner.py" name="mission_planner" output="screen"/>
-    <node pkg="swarm" type="arrowNoTurnLENFinal.py" name="camera" output="screen"/>
+    <!-- <node pkg="swarm" type="arrowNoTurnLENFinal.py" name="camera" output="screen"/> -->
 
   <rosparam command="load" file="$(find crazyswarm)/launch/crazyflieTypes.yaml" />
   <rosparam command="load" file="$(find swarm)/config/crazyflies.yaml" />
@@ -44,10 +44,10 @@
         kalman:
           resetEstimation: 1
       # tracking
-      motion_capture_type: none # one of none,vicon,optitrack,optitrack_closed_source,qualisys,vrpn
+      motion_capture_type: "vicon" # one of none,vicon,optitrack,optitrack_closed_source,qualisys,vrpn
       object_tracking_type: "libobjecttracker" # one of motionCapture,libobjecttracker
       send_position_only: False # set to False to send position+orientation; set to True to send position only
-      motion_capture_host_name: "vicon"
+      motion_capture_host_name: "192.168.0.199"
       # motion_capture_interface_ip: "" # optional for optitrack with multiple interfaces
       save_point_clouds: "/dev/null" # set to a valid path to log mocap point cloud binary file.
       print_latency: False

@@ -48,9 +48,12 @@ def firedata_callback(req):
     apf.surround_fire(grid, req.startx/100, req.starty/100, req.width/100, req.height/100, 3)
     return FireDataResponse(True)
 
-srv = rospy.Service("firedata", FireData, firedata_callback)
+#srv = rospy.Service("firedata", FireData, firedata_callback)
 
 apf = ArtificialPotentialField()
 print("Takeoff")
+time.sleep(1)
+apf.land_single(6)
+#apf.form_3d(radius=0.75, num_edges=2, h = 0.5, obj_h=1.0)
 
 #[[0, 4, 0], [2.0, 5.0, 0], [4.0, 2.0, 0], [6.0, 4.0, 0], [7.0, 5.0, 0]]

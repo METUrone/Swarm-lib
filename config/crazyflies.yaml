@@ -2,16 +2,16 @@
 
 
 crazyflies:
-- channel: 105
-  id: 199
+- channel: 125
+  id: 6
   initialPosition:
   - 0.0
   - 0.0
   - 0.0
   type: default
   
-# - channel: 105
-#   id: 200
+# - channel: 125
+#   id: 6
 #   initialPosition:
 #   - -0.5
 #   - 0.0
@@ -26,21 +26,21 @@ crazyflies:
 #   - 0.0
 #   type: default
 
-- channel: 95
-  id: 209
-  initialPosition:
-  - 0.5
-  - 0.0
-  - 0.0
-  type: default
+# - channel: 95
+#   id: 209
+#   initialPosition:
+#   - 0.5
+#   - 0.0
+#   - 0.0
+#  type: default
 
-- channel: 95
-  id: 210
-  initialPosition:
-  - -0.5
-  - 0.0
-  - 0.0
-  type: default
+# - channel: 95
+#   id: 210
+#   initialPosition:
+#   - -0.5
+#   - 0.0
+#   - 0.0
+#   type: default
 
 # - channel: 95
 #   id: 211

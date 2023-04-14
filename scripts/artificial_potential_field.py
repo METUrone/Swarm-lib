@@ -9,6 +9,7 @@ from utils import *
 from geometry_msgs.msg import PoseStamped, Twist
 from threading import Thread
 from utils import taxicab_dist
+from swarm.srv import Land
 
 
 class ArtificialPotentialField():
@@ -38,6 +39,9 @@ class ArtificialPotentialField():
         # Get obstacles from params
         self.obstacles = rospy.get_param("/obstacles")
         self.obstacle_radius = rospy.get_param("/radius")
+
+        self.land_client = rospy.ServiceProxy("land", Land)
+        rospy.wait_for_service("land")
         
 
         for agent in self.agents:
@@ -456,6 +460,25 @@ class ArtificialPotentialField():
         print(coordinates)
         self.form_coordinates(coordinates=coordinates)
     
+    def land_single(self, id, target=0.05):
+        pos_z = self.agent_positions[id][2]
+        print("Landdd")
+        while (abs(target - pos_z) > 0.05):
+            vel_command = Twist()
+
+            vel_command.linear.x = 0
+            vel_command.linear.y = 0
+            vel_command.linear.z = (target - pos_z)*0.5
+            self.vel_commands[id] = vel_command
+
+            self.rate.sleep()
+            pos_z = self.agent_positions[id][2]
+            print("Z= ", pos_z)
+
+        self.stop_all()
+
+        #self.land_client.call(id)
+
     def land_swarm_inorder(self):
         print("Swarm land")
         coordinates=np.zeros((self.num_of_drones,3))

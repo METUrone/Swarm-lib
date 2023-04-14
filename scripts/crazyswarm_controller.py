@@ -38,11 +38,10 @@ for agent in agent_list:
 timeHelper.sleep(3)
 
 def land_callback(req):
-    for e in landing:
-        landing[e] = True
-
-    agents_by_id[req.id].land(0.05, 5)
-    return LandResponse(False)
+    print("Serivce")
+    landing[req.id] = True
+    agents_by_id[req.id].land(0.05, 4.5)
+    return LandResponse(True)
 
 def vel_commander_callback(data: Twist, agent_id):
     global vel_commands

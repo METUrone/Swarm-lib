@@ -90,13 +90,13 @@ class ArtificialPotentialField():
         return self.agent_ids
 
     def position_callback(self, data, id):
+        #print("Z POSCALBACK", data.pose.position.z, " ID: ", id)
         self.agent_positions[id] = [data.pose.position.x, data.pose.position.y, data.pose.position.z]
 
     #function to publish Twist message to each drone
     def send_vel_commands(self):
 
         for id in self.agent_ids:
-            # print(self.vel_commands[id])
             self.vel_publishers[id].publish(self.limit_velocity(self.vel_commands[id], self.speed_limit))
 
     def vel_commander_loop(self):
@@ -461,34 +461,31 @@ class ArtificialPotentialField():
         self.form_coordinates(coordinates=coordinates)
     
     def land_single(self, id, target=0.05):
-        pos_z = self.agent_positions[id][2]
-        print("Landdd")
-        while (abs(target - pos_z) > 0.05):
-            vel_command = Twist()
+        while (self.agent_positions[id][2]) == 0:
+            time.sleep(0.01)
+        
+        # pos_z = self.agent_positions[id][2]
 
-            vel_command.linear.x = 0
-            vel_command.linear.y = 0
-            vel_command.linear.z = (target - pos_z)*0.5
-            self.vel_commands[id] = vel_command
+        # while (abs(target - pos_z) > 0.07):
+        #     vel_command = Twist()
 
-            self.rate.sleep()
-            pos_z = self.agent_positions[id][2]
-            print("Z= ", pos_z)
+        #     vel_command.linear.x = 0
+        #     vel_command.linear.y = 0
+        #     vel_command.linear.z = (target - pos_z)*0.5
+        #     self.vel_commands[id] = vel_command
 
-        self.stop_all()
+        #     self.rate.sleep()
+        #     pos_z = self.agent_positions[id][2]
+        #     print("Z= ", pos_z)
 
-        #self.land_client.call(id)
+        # self.vel_commands[id] = self.stop_velocity
+
+        self.land_client.call(id)
 
     def land_swarm_inorder(self):
-        print("Swarm land")
-        coordinates=np.zeros((self.num_of_drones,3))
-        print(self.agent_positions)
-        for i in range(self.num_of_drones): 
-            coordinates[i] = self.agent_positions[self.agent_ids[i]]
-        print(coordinates)
-        for j in range(self.num_of_drones):
-            coordinates[j][2] = 0.1
-            self.form_coordinates(coordinates=coordinates) 
+        for id in self.agent_ids[::-1]:
+            self.land_single(id)
+            time.sleep(4)
 
     def land_prism_inorder(self, distance_between = 1, height = 0.5):
         print("Landing initiated")
@@ -501,7 +498,7 @@ class ArtificialPotentialField():
         self.form_coordinates(coordinates)
         self.land_swarm_inorder()
 
-    def surround_fire(self, grid, sx, sy, width, height, agent_count = 6):
+    def surround_fire(self, grid, sx, sy, width, height, agent_count = 6, iter=5):
         circumference = []
         positions = []
         sorted_positions = []
@@ -512,94 +509,27 @@ class ArtificialPotentialField():
         cell_w = width / grid_width
         cell_h = height / grid_height
 
-        for i in range(0, grid_width):
-            for j in range(0, grid_height):
-                if grid[j][i]: #only check False items
-                    continue
-                
-                #check neighbours
-                for ii in range(i - 1, i + 2):
-                    for jj in range(j - 1, j + 2):
-                        if ii < 0 or ii >= grid_width or jj < 0 or jj >= grid_height:
-                            continue
-                        
-                        if grid[jj][ii] and [ii, jj] not in circumference:
-                            circumference.append([ii, jj, 0])
+        while iter > 0:
+            for i in range(0, grid_width):
+                for j in range(0, grid_height):
+                    if grid[j][i]: #only check False items
+                        continue
+                    
+                    #check neighbours
+                    for ii in range(i - 1, i + 2):
+                        for jj in range(j - 1, j + 2):
+                            if ii < 0 or ii >= grid_width or jj < 0 or jj >= grid_height:
+                                continue
+                            
+                            if grid[jj][ii] and [ii, jj] not in circumference:
+                                circumference.append([ii, jj, 0])
 
-        for pos in circumference:
-            grid[pos[1]][pos[0]] = 0
+            for pos in circumference:
+                grid[pos[1]][pos[0]] = 0
 
-        circumference.clear()
-
-        for i in range(0, grid_width):
-            for j in range(0, grid_height):
-                if grid[j][i]: #only check False items
-                    continue
-                
-                #check neighbours
-                for ii in range(i - 1, i + 2):
-                    for jj in range(j - 1, j + 2):
-                        if ii < 0 or ii >= grid_width or jj < 0 or jj >= grid_height:
-                            continue
-                        
-                        if grid[jj][ii] and [ii, jj] not in circumference:
-                            circumference.append([ii, jj, 0])
-
-        for pos in circumference:
-            grid[pos[1]][pos[0]] = 0
-
-        circumference.clear()
-
-        for i in range(0, grid_width):
-            for j in range(0, grid_height):
-                if grid[j][i]: #only check False items
-                    continue
-                
-                #check neighbours
-                for ii in range(i - 1, i + 2):
-                    for jj in range(j - 1, j + 2):
-                        if ii < 0 or ii >= grid_width or jj < 0 or jj >= grid_height:
-                            continue
-                        
-                        if grid[jj][ii] and [ii, jj] not in circumference:
-                            circumference.append([ii, jj, 0])
-        for pos in circumference:
-            grid[pos[1]][pos[0]] = 0
-
-        circumference.clear()
-
-        for i in range(0, grid_width):
-            for j in range(0, grid_height):
-                if grid[j][i]: #only check False items
-                    continue
-                
-                #check neighbours
-                for ii in range(i - 1, i + 2):
-                    for jj in range(j - 1, j + 2):
-                        if ii < 0 or ii >= grid_width or jj < 0 or jj >= grid_height:
-                            continue
-                        
-                        if grid[jj][ii] and [ii, jj] not in circumference:
-                            circumference.append([ii, jj, 0])
-
-        for pos in circumference:
-            grid[pos[1]][pos[0]] = 0
-
-        circumference.clear()
-
-        for i in range(0, grid_width):
-            for j in range(0, grid_height):
-                if grid[j][i]: #only check False items
-                    continue
-                
-                #check neighbours
-                for ii in range(i - 1, i + 2):
-                    for jj in range(j - 1, j + 2):
-                        if ii < 0 or ii >= grid_width or jj < 0 or jj >= grid_height:
-                            continue
-                        
-                        if grid[jj][ii] and [ii, jj] not in circumference:
-                            circumference.append([ii, jj, 0])
+            iter = iter - 1
+            if (iter > 0):
+                circumference.clear()
 
         agent_dist = len(circumference) / agent_count #optimum distance between agents
         sorted_positions.append(circumference[0])

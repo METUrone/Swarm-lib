@@ -14,8 +14,8 @@ agent::agent(int _id, ros::NodeHandle _nh) : pos(_pos), vel(_vel), nh(_nh), id(_
     obs.push_back(obstacle( 0,  1, 0.1));
     obs.push_back(obstacle(-1, -1, 0.1));
     
-    pub = nh.advertise<geometry_msgs::Twist>(std::to_string(id) + std::string("/vel_commander"), 50);
-    sub = nh.subscribe(std::to_string(id) + std::string("/position"), 20, &agent::fetch_pos, this);
+    pub = nh.advertise<geometry_msgs::Twist>(std::string("/") + std::to_string(id) + std::string("/vel_commander"), 50);
+    sub = nh.subscribe(std::string("/") + std::to_string(id) + std::string("/position"), 20, &agent::fetch_pos, this);
 }
 
 agent::agent(int _id, ros::NodeHandle _nh, vector3f pos) : pos(_pos), vel(_vel), nh(_nh), id(_id) {

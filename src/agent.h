@@ -8,7 +8,7 @@
 #include <thread>
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
-#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/PoseStamped.h>
 
 #define dist2(v1, v2) sqrt(pow(v1.x - v2.x, 2) + pow(v1.y - v2.y, 2))
 #define dist3(v1, v2) sqrt(pow(v1.x - v2.x, 2) + pow(v1.y - v2.y, 2) + pow(v1.z - v2.z, 2))
@@ -16,7 +16,7 @@
 #define KP 1.875
 #define KI 0.2
 #define KD 0.24
-#define ERROR 0.005
+#define ERROR 0.085
 #define AGENT_RADIUS 0.05
 
 struct vector2f {
@@ -63,23 +63,32 @@ struct vector3f {
     }
 };
 
+struct obstacle {
+    float x, y;
+    float radius;
+
+    obstacle(float x, float y, float r) : x(x), y(y), radius(r) {}
+};
+
 class agent {
     public:
-        agent(int id, ros::NodeHandle nh);
-        agent(int id, ros::NodeHandle nh, vector3f pos);
+        agent(int id, ros::NodeHandle& nh);
+        agent(int id, ros::NodeHandle& nh, vector3f pos);
 
-        void add_objective(vector2f p);
+        void add_objective(vector3f p);
         void clear_objectives();
-        vector2f cur_objective();
+        vector3f cur_objective();
         void start();
         void stop();
         void pause();
         bool completed() const;
+        void fetch_pos();
         static bool completed_all();
 
         ~agent();
         
         static std::vector<agent*> agents;
+        //static std::vector<obstacle> obs;
         const vector3f& pos;
         const vector3f& vel;
         int priority, id;
@@ -90,25 +99,18 @@ class agent {
         void go_to(vector3f p);
         void apf(vector3f);
         bool reached(vector3f p) const;
-        void fetch_pos(const geometry_msgs::Pose::ConstPtr &msg);
+        
         
         bool active;
-        std::queue<vector2f> objectives;
+        std::queue<vector3f> objectives;
         std::thread thread;
         vector3f _pos, _vel;
         
         geometry_msgs::Twist twist_vel;
 
-        ros::NodeHandle nh;
+        ros::NodeHandle& nh;
         ros::Publisher pub;
         ros::Subscriber sub;
-};
-
-struct obstacle {
-    float x, y;
-    float radius;
-
-    obstacle(float x, float y, float r) : x(x), y(y), radius(r) {}
 };
 
 #endif

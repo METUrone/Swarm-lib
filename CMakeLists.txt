@@ -15,6 +15,8 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
 )
 
+find_package(yaml-cpp REQUIRED)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -121,6 +123,7 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${YAML_CPP_INCLUDE_DIR}
 )
 
 ## Declare a C++ library
@@ -152,6 +155,7 @@ add_library(agent src/agent.cpp)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(apf
    ${catkin_LIBRARIES}
+   ${YAML_CPP_LIBRARIES}
    agent
 )
 

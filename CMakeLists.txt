@@ -50,12 +50,14 @@ find_package(yaml-cpp REQUIRED)
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  general_parameters.msg
+  obstacle.msg
+  pose.msg
+  RPY.msg
+  zumo.msg
+)
 
 # Generate services in the 'srv' folder
 add_service_files(
@@ -218,7 +220,7 @@ target_link_libraries(apf
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(takeoff src/iris_takeoff.cpp)
-target_link_libraries(takeoff
-  ${catkin_LIBRARIES}
-)
+# add_executable(takeoff src/iris_takeoff.cpp)
+# target_link_libraries(takeoff
+#   ${catkin_LIBRARIES}
+# )

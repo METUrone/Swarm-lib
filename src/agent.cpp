@@ -206,6 +206,6 @@ void agent::fetch_pos() {
 
 agent::~agent() {
     //remove from agents list
-    thread.join();
+    // thread.join();
 }
 

@@ -15,18 +15,16 @@ agent::agent(int id, ros::NodeHandle& nh) : pos(_pos), vel(_vel), nh(nh), id(id)
     obs.push_back(obstacle(-1, -1, 0.1));*/
     
     pub = nh.advertise<geometry_msgs::Twist>(std::string("/") + std::to_string(id) + std::string("/vel_commander"), 50);
-    //sub = nh.subscribe(std::string("/") + std::to_string(id) + std::string("/position"), 20, &agent::fetch_pos, this);
 }
 
 agent::agent(int id, ros::NodeHandle& nh, vector3f posa) : pos(_pos), vel(_vel), nh(nh), id(id) {
     _pos = posa;
     agents.push_back(this);
-    //obs.push_back(obstacle(1.1, 1, 0.1));
-    obs.push_back(obstacle( 0.2,  1, 0.1));
-    obs.push_back(obstacle( 0.6,  1, 0.1));
+    obs.push_back(obstacle(0.35, 1, 0.05));
+    obs.push_back(obstacle(0.10, 1, 0.05));
+    obs.push_back(obstacle(0.75, 1, 0.05));
 
     pub = nh.advertise<geometry_msgs::Twist>(std::string("/") + std::to_string(id) + std::string("/vel_commander"), 50);
-    //sub = nh.subscribe(std::string("/") + std::to_string(id) + std::string("/position"), 20, &agent::fetch_pos, this);
 }
 
 void agent::add_objective(vector3f p) {
@@ -117,7 +115,7 @@ void agent::apf(vector3f p) {
             if (a == this) continue;
             if (dist3(pos, a->pos) < 0.5) {
                 vector3f dir = pos - a->pos; dir = dir / dist3(dir, zero);
-                repl = repl + (dir * (0.005 * (1/dist3(pos, a->pos) - 1/0.5)*1/pow(dist3(pos, a->pos),2)));
+                repl = repl + (dir * (0.001 * (1/dist3(pos, a->pos) - 1/0.5)*1/pow(dist3(pos, a->pos),2)));
             }
         }
         
@@ -134,7 +132,7 @@ void agent::apf(vector3f p) {
         float d = dist3(pos, minv) - min.radius;
         if (d < 0.5) {
             vector3f dir = _pos - minv; dir = dir / dist3(dir, zero);
-            repl = repl + (dir * (0.005 * (1/d - 1/0.5)*1/pow(d,2)));
+            repl = repl + (dir * (0.001 * (1/d - 1/0.5)*1/pow(d,2)));
         }
         
         attr = ((p - _pos) * 0.75) / dist3(p, _pos);

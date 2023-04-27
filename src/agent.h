@@ -100,7 +100,6 @@ class agent {
         void apf(vector3f);
         bool reached(vector3f p) const;
         
-        
         bool active;
         std::queue<vector3f> objectives;
         std::thread thread;
@@ -110,7 +109,6 @@ class agent {
 
         ros::NodeHandle& nh;
         ros::Publisher pub;
-        ros::Subscriber sub;
 };
 
 #endif

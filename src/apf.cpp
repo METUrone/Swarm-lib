@@ -13,7 +13,7 @@ std::vector<obstacle> obs_list;
 
 void read_yaml(ros::NodeHandle& nh) {
     YAML::Node yaml_file = YAML::LoadFile("/home/aeren/havelsan-swarm/src/Swarm-lib/config/crazyflies.yaml");
-    YAML::Node obs_file = YAML::LoadFile("/home/aeren/havelsan-swarm/src/Swarm-lib/config/obstacles.yaml");
+    YAML::Node obs_file = YAML::LoadFile("/home/aeren/havelsan-swarm/src/Swarm-lib/config/obstacles2.yaml");
     YAML::Node crazyflies = yaml_file["crazyflies"];
     YAML::Node poses = obs_file["obstacles"];
 

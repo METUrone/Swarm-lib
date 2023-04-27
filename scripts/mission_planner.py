@@ -53,10 +53,17 @@ def firedata_callback(req):
 apf = ArtificialPotentialField()
 print("Takeoff")
 
-#apf.land_single(2)
-print("Dene")
+time.sleep(2)
+apf.form_3d(radius=0.5, num_edges="pyramid", h=1.0, obj_h=0.5)
+apf.go([1.0, 1.0, 0.0])
+apf.go([-2.0, 0.0, 0.0])
+apf.go([0.0, -2.0, 0.0])
+apf.go([2.0, 0.0, 0.0])
+apf.go([0.0, 2.0, 0.0])
+apf.go([-1.0, -1.0, 0.0])
+apf.rotate(degree=180, step=10, duration=6)
 
-apf.land_swarm_inorder()
+apf.land_swarm()
 
 #apf.form_3d(radius=0.75, num_edges=2, h = 0.5, obj_h=1.0)
 

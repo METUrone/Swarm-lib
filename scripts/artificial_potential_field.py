@@ -226,7 +226,7 @@ class ArtificialPotentialField():
                     continue
                 z_distance = self.agent_positions[id][2] - self.obstacles[i][2]
                 y_distance = self.agent_positions[id][1] - self.obstacles[i][1]
-                x_distance = self.agent_positions[id][0] - self.obstacles[i][0]
+                x_distance = self.agent_positions[id][0] - self.obstacles[i][0] 
             
                 if z_distance != 0 and abs(z_distance) < self.repulsive_threshold:
                     repulsive_force_z += (1/(z_distance**2))*(1/self.repulsive_threshold - 1/abs(z_distance))*(self.repulsive_constant) * (-(z_distance) / abs(z_distance))
@@ -486,6 +486,10 @@ class ArtificialPotentialField():
         for id in self.agent_ids[::-1]:
             self.land_single(id)
             time.sleep(4)
+
+    def land_swarm(self):
+        for id in self.agent_ids[::-1]:
+            self.land_single(id)
 
     def land_prism_inorder(self, distance_between = 1, height = 0.5):
         print("Landing initiated")
